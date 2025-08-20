@@ -1,0 +1,23 @@
+`define PAGE_SIZE_4K 1'b0
+`define PAGE_SIZE_4M 1'b1
+`define DTLB_STATE_NORMAL  5'b00001    //DTLB正常命中
+`define DTLB_STATE_MISS    5'b00010    //读L2TLB
+`define DTLB_STATE_REFILL  5'b00100    //L2TLB内容回填DTLB
+`define DTLB_STATE_RETRY1  5'b01000    //重读DTLB,阶段1
+`define DTLB_STATE_RETRY2  5'b10000    //重读DTLB,阶段2
+`define DTLB_SIDX_NORMAL  0
+`define DTLB_SIDX_MISS    1
+`define DTLB_SIDX_REFILL  2
+`define DTLB_SIDX_RETRY1  3
+`define DTLB_SIDX_RETRY2  4
+
+
+
+`define ITLB_STATE_NORMAL  4'b0001    //ITLB正常命中
+`define ITLB_STATE_MISS    4'b0010    //读L2TLB
+`define ITLB_STATE_REFILL  4'b0100    //L2TLB内容回填ITLB
+`define ITLB_STATE_RETRY   4'b1000    //重读ITLB
+`define ITLB_SIDX_NORMAL  0
+`define ITLB_SIDX_MISS    1
+`define ITLB_SIDX_REFILL  2
+`define ITLB_SIDX_RETRY   3
