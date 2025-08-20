@@ -10,7 +10,7 @@ nscscc-nputeam/
 │   ├── nscscc-team2/   
 │   ├── nscscc-team3/
 ├── NSCSCC2024/
-│   ├── nscscc-team2/
+│   ├── nscscc-team1/
 ├── NSCSCC2025/
 │   ├── nscscc-team1/
 │   ├── nscscc-team2/
