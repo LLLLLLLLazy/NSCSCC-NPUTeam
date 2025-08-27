@@ -28,7 +28,7 @@
 ## 项目说明
 
 本设计基于初赛的单发修改得出,在chiplab的614c047及之前的版本均可以正常运行并上板
-代码结构我们参考了[nscscc-2024-team](https://gitee.com/differential1012/nscscc-2024-team),能够通过比赛初赛提供的功能测试的58个测试点,性能测试分数为2.142,并正常启动 Linux 操作系统
+代码结构我们参考了[nscscc-2024-team](https://gitee.com/differential1012/nscscc-2024-team),能够通过比赛初赛提供的功能测试的58个测试点,性能测试分数为2.159,并正常启动 Linux 操作系统
 关于性能计数,可查看[原仓库](https://gitee.com/yan098/cpu-grass)cache_stall分支,可以查看性能计数的结果
 后面还做了一些优化,可以达到更高频率,参考[原仓库](https://gitee.com/yan098/cpu-grass)save_perf分支.但是在构建新的流水级之后出现95MHz上板不稳定的情况
 
