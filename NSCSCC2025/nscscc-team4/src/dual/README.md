@@ -3,7 +3,7 @@
 ## 主要特性
 
 - 工作频率:90MHz
-- 六级流水线阶段:PIF, IF, ID, FIFO, IS, EX1, EX2, MEM
+- 八级流水线阶段:PIF, IF, ID, FIFO, IS, EX1, EX2, MEM
 
 ## 参考设计
 
@@ -34,4 +34,4 @@
 
 ## 展望未来
 
-希望早日搓出乱序多发+npuSoC+npuLinux,不要出现最后几天手动编译Linux+手动魔改soc发现不会搞搞不通的情况🤓
+希望早日搓出乱序多发+NPUSoC+NPULinux(参考强校的CPU设计),不要出现最后几天手动编译Linux+手动魔改soc发现不会搞搞不通的情况🤓
