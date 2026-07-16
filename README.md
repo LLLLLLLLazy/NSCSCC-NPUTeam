@@ -1,5 +1,7 @@
 # NSCSCC-NPUTeam
 
+代码仓库：https://gitee.com/yan098/nscscc-nputeam.git
+
 #### 介绍
 西工大龙芯杯团队赛总仓库
 
