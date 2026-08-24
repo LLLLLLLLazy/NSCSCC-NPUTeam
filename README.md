@@ -17,6 +17,10 @@ nscscc-nputeam/
 │   ├── nscscc-team1/
 │   ├── nscscc-team2/
 │   ├── nscscc-team4/
+├── NSCSCC2026/
+│   ├── nscscc-team1/
+│   ├── nscscc-team5/
+│   ├── nscscc-team6/
 ├── LICENSE
 └── README.md
 ```
