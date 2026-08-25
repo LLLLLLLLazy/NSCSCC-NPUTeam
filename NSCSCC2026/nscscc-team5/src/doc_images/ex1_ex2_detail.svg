@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1480" viewBox="0 0 2400 1480">
+  <defs>
+    <marker id="xblue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="xgreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#059669"/></marker>
+    <marker id="xorange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ea580c"/></marker>
+    <marker id="xred" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <style>
+      .title{font:700 36px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#102033}
+      .subtitle{font:400 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .bandtitle{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a5f}
+      .head{font:700 23px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .small{font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569;text-anchor:middle}
+      .left{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155}
+      .label{font:700 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .blue{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#xblue)}
+      .green{stroke:#059669;stroke-width:4;fill:none;marker-end:url(#xgreen)}
+      .greenBus{stroke:#059669;stroke-width:4;fill:none}
+      .orange{stroke:#ea580c;stroke-width:4;fill:none;stroke-dasharray:10 7;marker-end:url(#xorange)}
+      .red{stroke:#dc2626;stroke-width:4.5;fill:none;stroke-dasharray:12 8;marker-end:url(#xred)}
+      .thin{stroke:#94a3b8;stroke-width:2;fill:none}
+      .box{stroke-width:2.2}
+    </style>
+  </defs>
+
+  <rect width="2400" height="1480" fill="#f8fafc"/>
+  <text x="55" y="56" class="title">为什么执行级拆成 EX1 与 EX2：先把原料选对，再真正计算</text>
+  <text x="55" y="92" class="subtitle">EX1 不是“beq 专用级”；所有指令都在这里处理操作数与相关，条件分支只是额外利用已选好的源做一次早期方向检查</text>
+
+  <rect x="35" y="120" width="2330" height="650" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="65" y="158" class="bandtitle">① 正常主路径：每拍可让不同指令分别占用 EX1 和 EX2</text>
+
+  <text x="25" y="430" class="label">来自 ID</text>
+  <path d="M30 450H70" class="blue"/>
+
+  <rect x="80" y="270" width="275" height="330" rx="16" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="217" y="310" class="head">ID_EX_reg</text>
+  <text x="217" y="345" class="txt">ID 译码后的指令包</text>
+  <line x1="110" y1="365" x2="325" y2="365" class="thin"/>
+  <text x="217" y="399" class="small">rj/rk 初始读值与寄存器号</text>
+  <text x="217" y="428" class="small">uses_rj / uses_rk</text>
+  <text x="217" y="457" class="small">I12 / I16 / I20 / UI5</text>
+  <text x="217" y="486" class="small">ALU、访存、分支等控制</text>
+  <text x="217" y="515" class="small">PC、预测、异常信息</text>
+  <text x="217" y="555" class="small">这里的寄存器值只是初始快照</text>
+  <text x="217" y="580" class="small">未必是最终应使用的值</text>
+
+  <rect x="430" y="185" width="760" height="535" rx="20" class="box" fill="#ecfeff" stroke="#0891b2"/>
+  <text x="810" y="226" class="head">EX1：操作数准备、相关处理与条件分支快路径</text>
+  <text x="810" y="255" class="small">核心问题：这条指令真正应该使用哪两个值？它们现在是否已经可用？</text>
+
+  <rect x="465" y="290" width="320" height="175" rx="14" fill="#ffffff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="625" y="326" class="head">A. 身份比较与 ready 检查</text>
+  <text x="625" y="362" class="small">rj/rk 是否等于 EX2、MEM、WBQ、WB 的 rd</text>
+  <text x="625" y="391" class="small">生产者是否真的写 GPR、rd 是否非 r0</text>
+  <text x="625" y="420" class="small">load / CSR / SC / 长运算结果是否已 ready</text>
+  <text x="625" y="449" class="small">最新 WBQ 写者未完成时必须等待</text>
+
+  <rect x="835" y="290" width="320" height="175" rx="14" fill="#ffffff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="995" y="326" class="head">B. 旁路多路选择器</text>
+  <text x="995" y="362" class="small">默认：ID 读出的寄存器堆快照</text>
+  <text x="995" y="391" class="small">可替换为 EX2 / MEM / WBQ / WB 的新值</text>
+  <text x="995" y="420" class="small">停顿中见过的一拍退休值也可保存后使用</text>
+  <text x="995" y="449" class="small">分别形成最新 rj 与最新 rk</text>
+
+  <rect x="465" y="500" width="320" height="175" rx="14" fill="#ffffff" stroke="#67e8f9" stroke-width="2"/>
+  <text x="625" y="536" class="head">C. 形成三种执行输入</text>
+  <text x="625" y="570" class="small">X1_ALU_A：最新 rj，或 pcaddu12i 的 PC</text>
+  <text x="625" y="599" class="small">X1_B_Op：最新 rk；store 数据仍保留在这里</text>
+  <text x="625" y="628" class="small">X1_ALU_B：rk 或 I12/I16/I20/UI5</text>
+  <text x="625" y="657" class="small">EX2 接到的是已选定输入，不再重做旁路</text>
+
+  <rect x="835" y="500" width="320" height="175" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="995" y="536" class="head">D. 额外的控制流工作</text>
+  <text x="995" y="570" class="small">条件分支比较快路径可安全取得的两源</text>
+  <text x="995" y="599" class="small">WBQ/晚结果相关时不触发提前修正</text>
+  <text x="995" y="628" class="small">只检查方向；同时识别 call / return</text>
+  <text x="995" y="657" class="small">普通 ALU/load/store 仍然经过 A、B、C</text>
+
+  <path d="M355 435H420" class="blue"/>
+  <text x="387" y="420" class="label">译码包</text>
+  <path d="M785 378H825" class="blue"/>
+  <path d="M995 465V490" class="blue"/>
+  <path d="M785 585H825" class="blue"/>
+
+  <rect x="1260" y="270" width="275" height="330" rx="16" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="1397" y="310" class="head">EX1_EX2_reg</text>
+  <text x="1397" y="345" class="txt">317 位执行包边界</text>
+  <line x1="1290" y1="365" x2="1505" y2="365" class="thin"/>
+  <text x="1397" y="400" class="small">已旁路完成的 ALU_A</text>
+  <text x="1397" y="429" class="small">保留寄存器值语义的 B_Op</text>
+  <text x="1397" y="458" class="small">已选好寄存器/立即数的 ALU_B</text>
+  <text x="1397" y="487" class="small">控制、PC、目标、预测、异常</text>
+  <text x="1397" y="527" class="small">EX2 或 MEM 反压时保持</text>
+  <text x="1397" y="556" class="small">flush 时写入 valid=0 气泡</text>
+
+  <path d="M1190 435H1250" class="blue"/>
+  <text x="1220" y="420" class="label">ready 才前进</text>
+
+  <rect x="1610" y="185" width="705" height="535" rx="20" class="box" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="1962" y="226" class="head">EX2：用稳定输入真正执行，并给出完整结果</text>
+  <text x="1962" y="255" class="small">核心问题：用已经确定的 A/B 做什么运算？结果、地址与真实下一 PC 是什么？</text>
+
+  <rect x="1645" y="290" width="300" height="175" rx="14" fill="#ffffff" stroke="#fdba74" stroke-width="2"/>
+  <text x="1795" y="326" class="head">A. ALU 与长运算</text>
+  <text x="1795" y="362" class="small">加减、逻辑、移位、slt/sltu</text>
+  <text x="1795" y="391" class="small">乘法发起/结果选择</text>
+  <text x="1795" y="420" class="small">除法与余数等待 finish</text>
+  <text x="1795" y="449" class="small">输出 ALU_result / add_result</text>
+
+  <rect x="1980" y="290" width="300" height="175" rx="14" fill="#ffffff" stroke="#fdba74" stroke-width="2"/>
+  <text x="2130" y="326" class="head">B. 地址类结果</text>
+  <text x="2130" y="362" class="small">load/store：VA = base + offset</text>
+  <text x="2130" y="391" class="small">jirl：target = rj + offset</text>
+  <text x="2130" y="420" class="small">检查访存地址对齐 ALE</text>
+  <text x="2130" y="449" class="small">预计算 cached DA/DMW 常见路径</text>
+
+  <rect x="1645" y="500" width="635" height="175" rx="14" fill="#ffffff" stroke="#f87171" stroke-width="2"/>
+  <text x="1962" y="536" class="head">C. 所有控制流的最终核验</text>
+  <text x="1962" y="570" class="small">形成 actual_taken、taken_target、fallthrough=PC+4</text>
+  <text x="1962" y="599" class="small">actual_next_pc = actual_taken ? taken_target : fallthrough</text>
+  <text x="1962" y="628" class="small">完整比较 pred_next_pc 与 actual_next_pc：方向错和目标错都能发现</text>
+  <text x="1962" y="657" class="small">结果 ready 且 MEM 能接收时，ex_direct_commit 只触发一次</text>
+
+  <path d="M1535 435H1600" class="blue"/>
+  <text x="1567" y="420" class="label">稳定执行包</text>
+  <path d="M1945 378H1970" class="blue"/>
+  <path d="M1962 465V490" class="blue"/>
+  <path d="M2315 435H2360" class="blue"/>
+  <text x="2337" y="420" class="label">去 EX_MEM</text>
+
+  <!-- Bypass sources -->
+  <rect x="35" y="800" width="1870" height="270" rx="22" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
+  <text x="65" y="838" class="bandtitle">② EX1 为什么对普通指令也必不可少：更老结果从后端返回，绕过尚未发生的寄存器堆写回</text>
+
+  <rect x="95" y="900" width="260" height="110" rx="13" fill="#ffffff" stroke="#34d399" stroke-width="2"/>
+  <text x="225" y="937" class="head">EX2 ready 结果</text>
+  <text x="225" y="974" class="small">紧邻前一条普通 ALU</text>
+  <rect x="405" y="900" width="260" height="110" rx="13" fill="#ffffff" stroke="#34d399" stroke-width="2"/>
+  <text x="535" y="937" class="head">MEM 结果</text>
+  <text x="535" y="974" class="small">已可旁路且不是晚结果</text>
+  <rect x="715" y="900" width="260" height="110" rx="13" fill="#ffffff" stroke="#34d399" stroke-width="2"/>
+  <text x="845" y="937" class="head">WBQ latest ready</text>
+  <text x="845" y="974" class="small">最年轻未退休写者</text>
+  <rect x="1025" y="900" width="260" height="110" rx="13" fill="#ffffff" stroke="#34d399" stroke-width="2"/>
+  <text x="1155" y="937" class="head">WB 退休值</text>
+  <text x="1155" y="974" class="small">本拍写回但 ID 可能读旧值</text>
+  <rect x="1335" y="900" width="510" height="110" rx="13" fill="#ffffff" stroke="#34d399" stroke-width="2"/>
+  <text x="1590" y="937" class="head">ID 快照 / EX1 停顿时保存的退休值</text>
+  <text x="1590" y="974" class="small">没有更新生产者时才使用快照；一拍旁路可被 saved_rj/rk 锁存</text>
+
+  <path d="M225 900V875" class="greenBus"/>
+  <path d="M535 900V875" class="greenBus"/>
+  <path d="M845 900V875" class="greenBus"/>
+  <path d="M1155 900V875" class="greenBus"/>
+  <path d="M1590 900V875" class="greenBus"/>
+  <path d="M225 875H1590" class="greenBus"/>
+  <path d="M995 875V720" class="green"/>
+  <text x="1070" y="858" class="label">按寄存器号与新旧顺序选择</text>
+
+  <!-- Recovery box -->
+  <rect x="1960" y="820" width="405" height="230" rx="18" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="2162" y="860" class="head">前端恢复：两条路径，职责不同</text>
+  <text x="2162" y="901" class="txt">EX1：仅条件分支方向错时尽早修正</text>
+  <text x="2162" y="938" class="txt">EX2：完整 Next-PC 不同则最终修正</text>
+  <text x="2162" y="980" class="small">恢复正确 PC、flush 年轻状态、切换 epoch</text>
+  <text x="2162" y="1014" class="small">预测正确时两条恢复路径都不触发</text>
+  <path d="M1155 590H1215V785H2020V810" class="red"/>
+  <text x="1560" y="778" class="label" fill="#b91c1c">EX1 条件方向 mismatch</text>
+  <path d="M2280 590H2335V785H2260V810" class="red"/>
+  <text x="2300" y="752" class="label" fill="#b91c1c">EX2 完整地址 mismatch</text>
+
+  <!-- Stall and bubble band -->
+  <rect x="35" y="1100" width="2330" height="330" rx="22" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="65" y="1138" class="bandtitle">③ EX1 发现操作数没准备好时：留下消费者、放走更老指令、向 EX2 注入气泡</text>
+
+  <rect x="95" y="1190" width="420" height="175" rx="15" fill="#ffffff" stroke="#fb923c" stroke-width="2"/>
+  <text x="305" y="1228" class="head">典型晚结果相关</text>
+  <text x="305" y="1265" class="txt">ld.w r3,r4,0</text>
+  <text x="305" y="1297" class="txt">add.w r5,r3,r6</text>
+  <text x="305" y="1335" class="small">add 已在 EX1，但 r3 数据尚未返回</text>
+
+  <rect x="660" y="1190" width="430" height="175" rx="15" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="875" y="1228" class="head">EX1 的控制动作</text>
+  <text x="875" y="1265" class="txt">ID_EX_En = 0：add 留在 EX1</text>
+  <text x="875" y="1297" class="txt">EX1_EX2_flush = 1：下一拍 EX2 是气泡</text>
+  <text x="875" y="1335" class="small">更老 load 继续从 EX2 前往 MEM/LQ</text>
+
+  <rect x="1235" y="1190" width="455" height="175" rx="15" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="1462" y="1228" class="head">数据 ready 以后</text>
+  <text x="1462" y="1265" class="txt">EX1 重新选择最新 r3</text>
+  <text x="1462" y="1297" class="txt">把正确 A/B 锁入 EX1_EX2_reg</text>
+  <text x="1462" y="1335" class="small">add 下一拍才在 EX2 真正执行</text>
+
+  <rect x="1835" y="1175" width="470" height="205" rx="15" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="2070" y="1215" class="head">拆级带来的效果</text>
+  <text x="2070" y="1253" class="txt">缩短关键路径，提高可实现时钟频率</text>
+  <text x="2070" y="1285" class="txt">无停顿时仍可每拍接收一条新指令</text>
+  <text x="2070" y="1322" class="small">代价：单条指令多一个流水边界、控制更复杂</text>
+  <text x="2070" y="1350" class="small">所以 EX1 用分支快修正弥补一部分额外罚时</text>
+
+  <path d="M515 1277H650" class="orange"/>
+  <path d="M1090 1277H1225" class="green"/>
+  <path d="M1690 1277H1825" class="blue"/>
+</svg>

@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1080" viewBox="0 0 1800 1080">
+  <defs>
+    <marker id="bpa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="bpr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <marker id="bpg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#059669"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .sub{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .head{font:700 23px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .note{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .label{font:700 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e40af}
+      .box{stroke-width:2;rx:15}
+      .blue{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#bpa)}
+      .red{stroke:#dc2626;stroke-width:4;fill:none;stroke-dasharray:10 7;marker-end:url(#bpr)}
+      .green{stroke:#059669;stroke-width:4;fill:none;marker-end:url(#bpg)}
+    </style>
+  </defs>
+  <rect width="1800" height="1080" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">动态分支预测：前端先猜，后端验证，错误就恢复并训练</text>
+  <text x="60" y="91" class="sub">本核：128 项直接映射 BTB + 每项一位局部历史/两只两位计数器 + 16 项 RAS</text>
+
+  <rect x="45" y="125" width="1110" height="520" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="75" y="162" class="label">预测路径：同一拍用当前 PC 产生猜测的下一 PC</text>
+
+  <rect x="80" y="220" width="190" height="120" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="175" y="258" class="head">当前 PC</text>
+  <text x="175" y="291" class="txt">index = PC[8:2]</text>
+  <text x="175" y="316" class="txt">tag = PC[31:9]</text>
+
+  <rect x="340" y="185" width="310" height="190" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="495" y="222" class="head">BTB[128] 直接映射</text>
+  <text x="495" y="258" class="txt">valid + 23-bit tag</text>
+  <text x="495" y="285" class="txt">32-bit target + type</text>
+  <text x="495" y="312" class="txt">type：条件 / 直接跳转</text>
+  <text x="495" y="339" class="txt">call / return / 间接跳转</text>
+
+  <rect x="340" y="430" width="310" height="155" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="495" y="468" class="head">branch_pattern[5]</text>
+  <text x="495" y="501" class="txt">last history：上次真实方向</text>
+  <text x="495" y="528" class="txt">counter0：history=0 时使用</text>
+  <text x="495" y="555" class="txt">counter1：history=1 时使用</text>
+
+  <rect x="720" y="185" width="260" height="155" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="850" y="222" class="head">16 项 RAS</text>
+  <text x="850" y="258" class="txt">call：保存 PC+4</text>
+  <text x="850" y="285" class="txt">return：优先使用栈顶</text>
+  <text x="850" y="312" class="txt">空栈则退回 BTB target</text>
+
+  <rect x="720" y="415" width="390" height="170" class="box" fill="#f0fdf4" stroke="#16a34a"/>
+  <text x="915" y="452" class="head">Next_PC 选择</text>
+  <text x="915" y="487" class="txt">BTB miss → PC+4</text>
+  <text x="915" y="514" class="txt">条件：counter.msb ? target : PC+4</text>
+  <text x="915" y="541" class="txt">return 且 RAS 非空 → RAS.top</text>
+  <text x="915" y="568" class="txt">其他控制流 → BTB target</text>
+
+  <path d="M270 280H330" class="blue"/>
+  <path d="M175 340V510H330" class="blue"/>
+  <path d="M650 320C690 320 680 455 710 455" class="blue"/>
+  <text x="680" y="352" class="note" text-anchor="middle">target + type</text>
+  <path d="M650 510H710" class="blue"/>
+  <path d="M850 340V405" class="blue"/>
+  <path d="M1110 500H1205" class="blue"/>
+
+  <rect x="1190" y="125" width="565" height="520" rx="22" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="1220" y="162" class="label" fill="#9a3412">执行路径：真实操作数具备后重新计算</text>
+  <rect x="1235" y="210" width="220" height="125" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="1345" y="248" class="head">EX1 快修正</text>
+  <text x="1345" y="281" class="txt">条件分支比较源操作数</text>
+  <text x="1345" y="309" class="txt">方向错时尽早 redirect</text>
+
+  <rect x="1500" y="210" width="215" height="125" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="1607" y="248" class="head">EX2 完整解析</text>
+  <text x="1607" y="281" class="txt">actual_taken</text>
+  <text x="1607" y="309" class="txt">actual_next_pc</text>
+
+  <rect x="1215" y="400" width="220" height="180" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="1325" y="437" class="head">送入流水线</text>
+  <text x="1325" y="472" class="txt">predicted_next_pc</text>
+  <text x="1325" y="500" class="txt">predicted_taken</text>
+  <text x="1325" y="528" class="txt">预测时 history</text>
+  <text x="1325" y="556" class="txt">与原指令 PC 一起保存</text>
+
+  <rect x="1480" y="405" width="235" height="160" class="box" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="1597" y="442" class="head">完整 PC 比较</text>
+  <text x="1597" y="477" class="txt">predicted_next_pc</text>
+  <text x="1597" y="505" class="txt">= actual_next_pc？</text>
+  <text x="1597" y="538" class="txt">方向/目标/类型错误</text>
+  <path d="M1455 272H1490" class="red"/>
+  <path d="M1607 335V395" class="red"/>
+  <path d="M1435 500H1470" class="blue"/>
+
+  <rect x="45" y="690" width="805" height="305" rx="22" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+  <text x="75" y="728" class="label" fill="#991b1b">猜错：恢复正确性</text>
+  <rect x="90" y="770" width="220" height="145" class="box" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="200" y="809" class="head">redirect</text>
+  <text x="200" y="844" class="txt">PC ← actual_next_pc</text>
+  <text x="200" y="872" class="txt">优先级低于异常/ERTN</text>
+  <text x="200" y="900" class="txt">但高于普通预测</text>
+  <rect x="365" y="770" width="210" height="145" class="box" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="470" y="809" class="head">flush 年轻状态</text>
+  <text x="470" y="844" class="txt">清 IFQ / 级间 valid</text>
+  <text x="470" y="872" class="txt">不撤销更老事务</text>
+  <text x="470" y="900" class="txt">不产生错误路径副作用</text>
+  <rect x="630" y="770" width="180" height="145" class="box" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="720" y="809" class="head">epoch + 1</text>
+  <text x="720" y="844" class="txt">迟到 ICache 响应</text>
+  <text x="720" y="872" class="txt">仍被接收回收</text>
+  <text x="720" y="900" class="txt">但不进入新 IFQ</text>
+  <path d="M180 750H740" stroke="#dc2626" stroke-width="4" fill="none" stroke-dasharray="10 7"/>
+  <path d="M200 750V760" class="red"/>
+  <path d="M470 750V760" class="red"/>
+  <path d="M720 750V760" class="red"/>
+
+  <rect x="900" y="690" width="855" height="305" rx="22" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
+  <text x="930" y="728" class="label" fill="#065f46">安全越过 EX2：训练性能状态（一次性 fire）</text>
+  <rect x="950" y="770" width="230" height="145" class="box" fill="#d1fae5" stroke="#059669"/>
+  <text x="1065" y="809" class="head">更新 BTB</text>
+  <text x="1065" y="844" class="txt">写真实 target / type</text>
+  <text x="1065" y="872" class="txt">普通指令若被污染</text>
+  <text x="1065" y="900" class="txt">则清陈旧 valid</text>
+  <rect x="1235" y="770" width="225" height="145" class="box" fill="#d1fae5" stroke="#059669"/>
+  <text x="1347" y="809" class="head">训练计数器</text>
+  <text x="1347" y="844" class="txt">用“预测时 history”选择</text>
+  <text x="1347" y="872" class="txt">按真实 T/N 饱和加减</text>
+  <text x="1347" y="900" class="txt">再写本次 history</text>
+  <rect x="1515" y="770" width="200" height="145" class="box" fill="#d1fae5" stroke="#059669"/>
+  <text x="1615" y="809" class="head">更新 RAS</text>
+  <text x="1615" y="844" class="txt">真实 call push</text>
+  <text x="1615" y="872" class="txt">真实 return pop</text>
+  <text x="1615" y="900" class="txt">异常/ERTN 清空</text>
+  <path d="M1715 272H1735V625C1735 680 1330 670 1330 735" class="green"/>
+  <path d="M1050 735H1630" stroke="#059669" stroke-width="4" fill="none"/>
+  <path d="M1065 735V760" class="green"/>
+  <path d="M1347 735V760" class="green"/>
+  <path d="M1615 735V760" class="green"/>
+  <path d="M1535 565C1400 650 600 620 470 750" class="red"/>
+  <rect x="60" y="1020" width="1680" height="42" rx="10" fill="#e2e8f0"/>
+  <text x="80" y="1048" class="note">预测器不改变程序语义：最坏只是一直猜错并付出 flush 代价；正确性由 EX1/EX2 的真实计算、完整 PC 比较和精确恢复保证。</text>
+</svg>

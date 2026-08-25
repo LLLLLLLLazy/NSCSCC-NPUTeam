@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1280" viewBox="0 0 1900 1280">
+  <defs>
+    <marker id="ca" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="co" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ea580c"/></marker>
+    <marker id="cp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7c3aed"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .sub{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .head{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .note{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .label{font:700 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a8a}
+      .box{stroke-width:2;rx:15}
+      .blue{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#ca)}
+      .orange{stroke:#ea580c;stroke-width:4;fill:none;marker-end:url(#co)}
+      .purple{stroke:#7c3aed;stroke-width:4;fill:none;marker-end:url(#cp)}
+    </style>
+  </defs>
+  <rect width="1900" height="1280" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">myCPU Cache 层次与一次缺失的内部状态</text>
+  <text x="60" y="91" class="sub">所有层的 cache line 都是 16 B（四个 32-bit word）；上方箭头指向下层请求，数据/refill 沿相反方向返回</text>
+
+  <rect x="50" y="125" width="1800" height="350" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="80" y="163" class="label">层次结构（从左到右，容量增大、访问延迟增加）</text>
+
+  <rect x="90" y="215" width="260" height="160" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="220" y="255" class="head">CPU 前端 / LQ / SB</text>
+  <text x="220" y="292" class="txt">取指请求</text>
+  <text x="220" y="321" class="txt">load / 已退休 store</text>
+  <text x="220" y="350" class="txt">SRAM-like req/addr_ok/data_ok</text>
+
+  <rect x="450" y="155" width="300" height="145" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="600" y="195" class="head">L1 ICache</text>
+  <text x="600" y="230" class="txt">32 KiB，1024 set × 2 way</text>
+  <text x="600" y="259" class="txt">只读；2 MSHR；4 项顺序响应</text>
+  <text x="600" y="285" class="txt">next-line stream prefetch</text>
+
+  <rect x="450" y="330" width="300" height="145" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="600" y="370" class="head">L1 DCache</text>
+  <text x="600" y="405" class="txt">64 KiB，2048 set × 2 way</text>
+  <text x="600" y="434" class="txt">write-back + write-allocate</text>
+  <text x="600" y="460" class="txt">主 FSM + 次级 clean-victim MSHR</text>
+
+  <rect x="860" y="215" width="310" height="170" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="1015" y="255" class="head">统一 L2 Cache</text>
+  <text x="1015" y="291" class="txt">128 KiB，2048 set × 4 way</text>
+  <text x="1015" y="320" class="txt">clean read-allocate；tree-PLRU</text>
+  <text x="1015" y="349" class="txt">2 MSHR + 4 项响应表</text>
+  <text x="1015" y="375" class="txt">D 写绕行并失效同行</text>
+
+  <rect x="1280" y="215" width="240" height="170" class="box" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="1400" y="255" class="head">AXI Bridge</text>
+  <text x="1400" y="291" class="txt">cached：四拍 WRAP</text>
+  <text x="1400" y="320" class="txt">bypass：单拍 INCR</text>
+  <text x="1400" y="349" class="txt">I/D context + 返回 FIFO</text>
+  <text x="1400" y="375" class="txt">五通道独立反压</text>
+
+  <rect x="1620" y="215" width="180" height="170" class="box" fill="#f1f5f9" stroke="#64748b"/>
+  <text x="1710" y="255" class="head">内存 / MMIO</text>
+  <text x="1710" y="291" class="txt">DDR / RAM</text>
+  <text x="1710" y="320" class="txt">UART 等外设</text>
+  <text x="1710" y="349" class="txt">可变延迟</text>
+
+  <path d="M350 260H440" class="blue"/><path d="M350 330C395 330 395 400 440 400" class="orange"/>
+  <path d="M750 227C810 227 805 270 850 270" class="blue"/><path d="M750 402C805 402 805 335 850 335" class="orange"/>
+  <path d="M1170 300H1270" class="blue"/><path d="M1520 300H1610" class="blue"/>
+  <path d="M750 440C1000 510 1150 430 1280 365" class="purple"/>
+  <text x="1030" y="450" class="note">D write-around：L2 不保留 dirty 数据</text>
+
+  <rect x="50" y="505" width="1800" height="155" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="80" y="542" class="label">物理地址如何选择一条 cache line</text>
+  <rect x="190" y="575" width="430" height="55" rx="8" fill="#fde68a" stroke="#d97706"/><text x="405" y="610" class="head">Tag：确认是不是目标内存行</text>
+  <rect x="620" y="575" width="520" height="55" rx="8" fill="#bfdbfe" stroke="#2563eb"/><text x="880" y="610" class="head">Index：选择一个 set</text>
+  <rect x="1140" y="575" width="230" height="55" rx="8" fill="#bbf7d0" stroke="#16a34a"/><text x="1255" y="610" class="head">word [3:2]</text>
+  <rect x="1370" y="575" width="210" height="55" rx="8" fill="#ddd6fe" stroke="#7c3aed"/><text x="1475" y="610" class="head">byte [1:0]</text>
+  <text x="1610" y="598" class="note">16 B line → offset 共 4 bit</text><text x="1610" y="624" class="note">每 set 并行比较所有 way</text>
+
+  <rect x="50" y="690" width="865" height="520" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="80" y="730" class="label">ICache：用 MSHR 和响应队列把“完成顺序”变回“请求顺序”</text>
+  <rect x="95" y="775" width="190" height="90" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="190" y="810" class="head">同步 lookup</text><text x="190" y="839" class="txt">读两路 tag/data</text>
+  <rect x="365" y="755" width="210" height="90" class="box" fill="#d1fae5" stroke="#059669"/>
+  <text x="470" y="790" class="head">resident hit</text><text x="470" y="819" class="txt">目标 word 立即 ready</text>
+  <rect x="365" y="885" width="210" height="110" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="470" y="920" class="head">miss / merge</text><text x="470" y="949" class="txt">绑定 MSHR0/1</text><text x="470" y="976" class="txt">或合并同 line miss</text>
+  <rect x="650" y="775" width="210" height="220" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="755" y="812" class="head">4 项响应队列</text>
+  <text x="755" y="850" class="txt">每个请求先占 slot</text>
+  <text x="755" y="880" class="txt">hit/critical beat 填 ready</text>
+  <text x="755" y="910" class="txt">只允许最老 head data_ok</text>
+  <text x="755" y="940" class="txt">年轻结果可先完成</text>
+  <text x="755" y="970" class="txt">但不能越过老请求返回 CPU</text>
+  <rect x="95" y="1040" width="480" height="115" class="box" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="335" y="1075" class="head">MSHR：一条未完成 line 的所有权</text>
+  <text x="335" y="1107" class="txt">tag/index/way/start_word/word_valid/refill_line/request id</text>
+  <text x="335" y="1136" class="txt">critical word ready 可提前唤醒 slot；四拍齐全后再安装</text>
+  <path d="M285 820H355" class="blue"/><path d="M285 835C325 835 325 940 355 940" class="orange"/>
+  <path d="M575 800H640" class="blue"/><path d="M575 940H640" class="orange"/>
+  <path d="M470 995C470 1020 420 1025 400 1030" class="orange"/>
+  <path d="M575 1095C625 1095 620 970 640 960" class="orange"/>
+
+  <rect x="955" y="690" width="895" height="520" rx="22" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="985" y="730" class="label" fill="#9a3412">DCache 主 FSM：dirty victim 必须先完整写回</text>
+  <g fill="#ffedd5" stroke="#ea580c">
+    <rect x="1000" y="785" width="170" height="85" class="box"/><rect x="1240" y="785" width="170" height="85" class="box"/>
+    <rect x="1480" y="785" width="300" height="85" class="box"/><rect x="1480" y="925" width="300" height="85" class="box"/>
+    <rect x="1240" y="925" width="170" height="85" class="box"/><rect x="1000" y="925" width="170" height="85" class="box"/>
+    <rect x="1120" y="1070" width="540" height="95" class="box"/>
+  </g>
+  <text x="1085" y="818" class="head">IDLE</text><text x="1085" y="846" class="txt">接收请求</text>
+  <text x="1325" y="818" class="head">LOOKUP</text><text x="1325" y="846" class="txt">hit / 选 victim</text>
+  <text x="1630" y="818" class="head">WB_REQ ↔ WB_WAIT</text><text x="1630" y="846" class="txt">dirty 时逐 word 地址握手 + 写响应，共四次</text>
+  <text x="1630" y="958" class="head">RD_REQ → RD_WAIT</text><text x="1630" y="986" class="txt">四拍 WRAP，critical beat 可 early data_ok</text>
+  <text x="1325" y="958" class="head">REFILL_PREP</text><text x="1325" y="986" class="txt">冻结 final_line</text>
+  <text x="1085" y="958" class="head">REFILL_WRITE</text><text x="1085" y="986" class="txt">单写口安装</text>
+  <text x="1390" y="1104" class="head">store miss 的关键区别</text>
+  <text x="1390" y="1134" class="txt">critical beat 先按 wstrb 合入 refill buffer；cache 接管后可确认 store；整行稍后安装为 dirty</text>
+  <path d="M1170 827H1230" class="orange"/>
+  <path d="M1410 827H1470" class="orange"/>
+  <path d="M1780 870V915" class="orange"/>
+  <path d="M1480 968H1420" class="orange"/>
+  <path d="M1240 968H1180" class="orange"/>
+  <path d="M1085 925C970 900 970 870 1085 870" class="orange"/>
+
+  <text x="60" y="1250" class="note">正确性核心：valid+tag 才能 hit；dirty 数据不能静默丢失；每个返回 beat 只能属于一个有效 MSHR；单写端口未获准的架构更新必须保持 pending。</text>
+</svg>

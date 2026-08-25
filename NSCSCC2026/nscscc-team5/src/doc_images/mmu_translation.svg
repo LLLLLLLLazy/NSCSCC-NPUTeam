@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100">
+  <defs>
+    <marker id="ma" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="me" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .sub{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .head{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .note{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .label{font:700 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a8a}
+      .box{stroke-width:2;rx:15}
+      .arrow{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#ma)}
+      .err{stroke:#dc2626;stroke-width:4;fill:none;marker-end:url(#me)}
+    </style>
+  </defs>
+  <rect width="1800" height="1100" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">MMU 地址翻译：先判断模式，再得到物理地址、访问属性或精确异常</text>
+  <text x="60" y="91" class="sub">取指使用 TLB s0，数据访问/TLBSRCH 使用 s1；本核没有硬件页表遍历器，TLB miss 由软件 refill</text>
+
+  <rect x="60" y="145" width="240" height="125" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="180" y="183" class="head">输入上下文</text>
+  <text x="180" y="217" class="txt">VA + 取指/load/store</text>
+  <text x="180" y="245" class="txt">PLV + ASID + CRMD</text>
+
+  <rect x="380" y="135" width="280" height="145" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="520" y="173" class="head">地址模式选择</text>
+  <text x="520" y="207" class="txt">① DA 直接地址</text>
+  <text x="520" y="234" class="txt">② DMW 窗口命中</text>
+  <text x="520" y="261" class="txt">③ PG 普通 TLB</text>
+  <path d="M300 207H370" class="arrow"/>
+
+  <rect x="750" y="120" width="275" height="125" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="887" y="158" class="head">DA 路径</text>
+  <text x="887" y="192" class="txt">PA = VA</text>
+  <text x="887" y="220" class="txt">MAT = DATF 或 DATM</text>
+
+  <rect x="750" y="285" width="275" height="145" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="887" y="323" class="head">DMW 路径</text>
+  <text x="887" y="357" class="txt">比较 VA[31:29] 与 VSEG</text>
+  <text x="887" y="384" class="txt">检查 PLV0/PLV3 允许位</text>
+  <text x="887" y="411" class="txt">PA={PSEG,VA[28:0]}</text>
+
+  <rect x="750" y="475" width="470" height="310" class="box" fill="#f1f5f9" stroke="#64748b"/>
+  <text x="985" y="514" class="head">32 项、8 组 × 4 路 TLB</text>
+  <text x="985" y="549" class="txt">先比较：E=1 且 VPPN 匹配</text>
+  <text x="985" y="578" class="txt">普通项还要求 ASID 相等；G=1 忽略 ASID</text>
+  <line x1="790" y1="605" x2="1180" y2="605" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="885" y="640" class="label">4 KiB（PS=12）</text>
+  <text x="885" y="670" class="txt">VA[12] 选 ELO0/1</text>
+  <text x="885" y="697" class="txt">offset=VA[11:0]</text>
+  <text x="1080" y="640" class="label">2 MiB（PS=21）</text>
+  <text x="1080" y="670" class="txt">VA[21] 选 ELO0/1</text>
+  <text x="1080" y="697" class="txt">offset=VA[20:0]</text>
+  <text x="985" y="746" class="txt">选择侧给出 PPN / V / D / PLV / MAT</text>
+
+  <path d="M660 175H740" class="arrow"/>
+  <path d="M660 207C705 207 700 357 740 357" class="arrow"/>
+  <path d="M660 240C700 240 700 630 740 630" class="arrow"/>
+
+  <rect x="1290" y="185" width="430" height="275" class="box" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="1505" y="225" class="head">TLB 路径权限与存在性检查</text>
+  <text x="1505" y="266" class="txt">没有匹配项 found=0 → TLBR</text>
+  <text x="1505" y="298" class="txt">匹配但所选 V=0 → PIF / PIL / PIS</text>
+  <text x="1505" y="330" class="txt">当前 PLV 权限不足 → PPI</text>
+  <text x="1505" y="362" class="txt">store 且 D=0 → PME</text>
+  <text x="1505" y="408" class="txt">检查通过 → {PPN, page offset}</text>
+  <path d="M1025 182C1160 182 1170 575 1280 575" class="arrow"/>
+  <path d="M1025 357C1160 357 1170 625 1280 625" class="arrow"/>
+  <path d="M1220 630C1260 630 1250 405 1280 405" class="arrow"/>
+
+  <rect x="1290" y="535" width="430" height="190" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="1505" y="575" class="head">正常输出</text>
+  <text x="1505" y="613" class="txt">PA：送 ICache / DCache / bypass</text>
+  <text x="1505" y="644" class="txt">MAT：决定 cached 还是 uncached</text>
+  <text x="1505" y="675" class="txt">权限结果与原 PC/访存身份保持对齐</text>
+  <path d="M1505 460V525" class="arrow"/>
+
+  <rect x="60" y="835" width="1050" height="205" rx="20" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="90" y="875" class="label">一次注册 TLB 查询的时间关系</text>
+  <rect x="105" y="915" width="240" height="80" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="225" y="947" class="head">CAPTURE</text><text x="225" y="976" class="txt">锁存 VA 和访问类型</text>
+  <rect x="420" y="915" width="240" height="80" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="540" y="947" class="head">TLB_WAIT</text><text x="540" y="976" class="txt">四路并行比较一拍</text>
+  <rect x="735" y="915" width="315" height="80" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="892" y="947" class="head">CHECK / COMPLETE</text><text x="892" y="976" class="txt">PA+MAT 或异常与原请求重新配对</text>
+  <path d="M345 955H410" class="arrow"/>
+  <path d="M660 955H725" class="arrow"/>
+
+  <rect x="1160" y="835" width="560" height="205" rx="20" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+  <text x="1190" y="875" class="label" fill="#991b1b">TLB miss 的软件闭环</text>
+  <text x="1440" y="918" class="txt">TLBR 精确异常 → TLBRENTRY</text>
+  <text x="1440" y="949" class="txt">操作系统读取页表，填写 TLB CSR</text>
+  <text x="1440" y="980" class="txt">tlbfill/tlbwr → ertn → 原指令重新执行</text>
+  <text x="1440" y="1011" class="txt">不是 Cache miss，也不会由硬件自动访问页表</text>
+
+  <text x="60" y="1080" class="note">读图顺序：先看 DA/DMW/TLB 三选一，再看 TLB 是否 found，最后检查所选偶/奇页的 V、PLV、D；任何一步的上下文都必须和发起该查询的 PC/访存指令保持一致。</text>
+</svg>

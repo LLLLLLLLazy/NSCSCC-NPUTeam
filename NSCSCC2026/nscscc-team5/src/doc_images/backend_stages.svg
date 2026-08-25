@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="1350" viewBox="0 0 2500 1350">
+  <defs>
+    <style>
+      .title { font: 700 35px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #172033; }
+      .subtitle { font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #4b5b75; }
+      .head { font: 700 25px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #172033; }
+      .body { font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #26344d; }
+      .small { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #42536e; }
+      .tiny { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #53627a; }
+      .mono { font: 16px Consolas, "Microsoft YaHei", monospace; fill: #26344d; }
+      .stage { fill: #edf5ff; stroke: #4777b7; stroke-width: 3; rx: 16; }
+      .boundary { fill: #273b59; stroke: #17263e; stroke-width: 2; rx: 5; }
+      .queue { fill: #fff8e8; stroke: #b97920; stroke-width: 3; rx: 16; }
+      .lq { fill: #eefaf4; stroke: #398b62; stroke-width: 3; rx: 16; }
+      .sb { fill: #f7f0ff; stroke: #8357ad; stroke-width: 3; rx: 16; }
+      .cache { fill: #edf9f0; stroke: #35815a; stroke-width: 3; rx: 16; }
+      .arch { fill: #eef5ff; stroke: #4777b7; stroke-width: 3; rx: 16; }
+      .note { fill: #f8fafc; stroke: #a9b5c8; stroke-width: 2; rx: 14; }
+      .warn { fill: #fff2f2; stroke: #c94b4b; stroke-width: 2.5; rx: 14; }
+      .divider { stroke: #c3cedd; stroke-width: 2; }
+      .blue { fill: none; stroke: #3f72af; stroke-width: 4; marker-end: url(#arrow-blue); }
+      .green { fill: none; stroke: #31845b; stroke-width: 4; marker-end: url(#arrow-green); }
+      .orange { fill: none; stroke: #dd7d18; stroke-width: 4; marker-end: url(#arrow-orange); }
+      .purple { fill: none; stroke: #8552aa; stroke-width: 4; marker-end: url(#arrow-purple); }
+      .redDash { fill: none; stroke: #c94b4b; stroke-width: 4; stroke-dasharray: 10 8; marker-end: url(#arrow-red); }
+    </style>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3f72af"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#31845b"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#dd7d18"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#8552aa"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#c94b4b"/>
+    </marker>
+  </defs>
+
+  <rect width="2500" height="1350" fill="#ffffff"/>
+  <text x="50" y="54" class="title">后端放大图：EX1/EX2 分工，以及 MEM、LQ、WBQ、SB 的所有权</text>
+  <text x="50" y="88" class="subtitle">蓝色为主指令身份，绿色为结果/旁路，橙色为 load 请求，紫色为已退休 store；所有箭头均按 CPU_top.v 的真实方向绘制</text>
+
+  <line x1="1690" y1="75" x2="1740" y2="75" class="blue"/>
+  <text x="1750" y="81" class="small">主流水</text>
+  <line x1="1845" y1="75" x2="1895" y2="75" class="green"/>
+  <text x="1905" y="81" class="small">结果/响应</text>
+  <line x1="2040" y1="75" x2="2090" y2="75" class="orange"/>
+  <text x="2100" y="81" class="small">load/分配</text>
+  <line x1="2250" y1="75" x2="2300" y2="75" class="purple"/>
+  <text x="2310" y="81" class="small">store</text>
+
+  <!-- Main in-order pipeline. -->
+  <rect x="50" y="170" width="260" height="250" class="stage"/>
+  <text x="180" y="211" class="head" text-anchor="middle">ID</text>
+  <text x="180" y="243" class="small" text-anchor="middle">译码与寄存器堆初读</text>
+  <line x1="75" y1="260" x2="285" y2="260" class="divider"/>
+  <text x="75" y="293" class="body">识别指令与源/目的寄存器</text>
+  <text x="75" y="326" class="body">生成立即数和控制信息</text>
+  <text x="75" y="359" class="body">携带 PC、预测、异常</text>
+  <text x="75" y="392" class="small">读值只是快照，尚未最终确认</text>
+
+  <rect x="335" y="170" width="24" height="250" class="boundary"/>
+  <text x="347" y="295" transform="rotate(-90 347 295)" font-family="Consolas, Microsoft YaHei" font-size="14" fill="#ffffff" text-anchor="middle">ID_EX_reg</text>
+
+  <rect x="390" y="170" width="330" height="250" class="stage"/>
+  <text x="555" y="211" class="head" text-anchor="middle">EX1：准备正确输入</text>
+  <text x="555" y="243" class="small" text-anchor="middle">回答“值从哪里来、现在齐不齐”</text>
+  <line x1="415" y1="260" x2="695" y2="260" class="divider"/>
+  <text x="415" y="293" class="body">比较 rj/rk 与老生产者 rd</text>
+  <text x="415" y="326" class="body">选择 EX2/MEM/WBQ/WB 旁路</text>
+  <text x="415" y="359" class="body">寄存器值或立即数选择</text>
+  <text x="415" y="392" class="body">条件分支方向早解析</text>
+
+  <rect x="750" y="170" width="24" height="250" class="boundary"/>
+  <text x="762" y="295" transform="rotate(-90 762 295)" font-family="Consolas, Microsoft YaHei" font-size="14" fill="#ffffff" text-anchor="middle">EX1_EX2_reg</text>
+
+  <rect x="805" y="170" width="350" height="250" class="stage"/>
+  <text x="980" y="211" class="head" text-anchor="middle">EX2：使用输入计算</text>
+  <text x="980" y="243" class="small" text-anchor="middle">回答“结果和真实下一 PC 是什么”</text>
+  <line x1="830" y1="260" x2="1130" y2="260" class="divider"/>
+  <text x="830" y="293" class="body">ALU / 比较 / 乘除</text>
+  <text x="830" y="326" class="body">load/store 虚地址与 ALE</text>
+  <text x="830" y="359" class="body">完整 actual next PC 核验</text>
+  <text x="830" y="392" class="small">长运算未完成时本级保持</text>
+
+  <rect x="1185" y="170" width="24" height="250" class="boundary"/>
+  <text x="1197" y="295" transform="rotate(-90 1197 295)" font-family="Consolas, Microsoft YaHei" font-size="14" fill="#ffffff" text-anchor="middle">EX_MEM_reg</text>
+
+  <rect x="1240" y="170" width="370" height="250" class="stage"/>
+  <text x="1425" y="211" class="head" text-anchor="middle">MEM：建立后续事务</text>
+  <text x="1425" y="243" class="small" text-anchor="middle">不是所有 load 都在这里等到数据返回</text>
+  <line x1="1265" y1="260" x2="1585" y2="260" class="divider"/>
+  <text x="1265" y="293" class="body">DA / DMW / TLB 翻译与权限</text>
+  <text x="1265" y="326" class="body">store-forward 与内存顺序检查</text>
+  <text x="1265" y="359" class="body">分配 WBQ；load 另分配 LQ</text>
+  <text x="1265" y="392" class="small">store 只建档，此处不写 D-cache</text>
+
+  <!-- WBQ is the replacement for a single MEM/WB register. -->
+  <rect x="1760" y="150" width="440" height="530" class="queue"/>
+  <text x="1980" y="191" class="head" text-anchor="middle">WBQ（4 项）：顺序完成与退休总账</text>
+  <text x="1980" y="222" class="small" text-anchor="middle">每条离开 MEM 的指令都有一项；只有 head 可以退休</text>
+  <line x1="1785" y1="240" x2="2175" y2="240" class="divider"/>
+  <rect x="1795" y="258" width="370" height="65" fill="#e9f7ed" stroke="#55a374" stroke-width="2" rx="8"/>
+  <text x="1815" y="285" class="mono">head：valid | ready | result/ex/store</text>
+  <text x="1815" y="309" class="small">ready 且无额外阻塞才可 wb_retire_fire</text>
+  <rect x="1795" y="336" width="370" height="54" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1815" y="370" class="mono">slot：年轻指令，可能已经 ready</text>
+  <rect x="1795" y="403" width="370" height="54" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1815" y="437" class="mono">slot：load 可 valid 但 not-ready</text>
+  <rect x="1795" y="470" width="370" height="54" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1815" y="504" class="mono">slot：保存完整退休元数据</text>
+  <rect x="1795" y="548" width="370" height="54" fill="#fff3df" stroke="#d59839" stroke-width="2" rx="7"/>
+  <text x="1815" y="582" class="mono">tail：wbq_enq 写入下一项</text>
+  <text x="1980" y="641" class="small" text-anchor="middle">scoreboard 向 EX1 提供最年轻 ready 生产者</text>
+
+  <rect x="2270" y="170" width="200" height="250" class="arch"/>
+  <text x="2370" y="210" class="head" text-anchor="middle">架构状态</text>
+  <line x1="2290" y1="226" x2="2450" y2="226" class="divider"/>
+  <text x="2300" y="260" class="body">GPR 写回</text>
+  <text x="2300" y="293" class="body">CSR / TLB</text>
+  <text x="2300" y="326" class="body">LLBit</text>
+  <text x="2300" y="359" class="body">异常 / ERTN</text>
+  <text x="2300" y="392" class="small">只由 WBQ head 提交</text>
+
+  <!-- Main path arrows. -->
+  <path d="M310 295 H335" class="blue"/>
+  <path d="M359 295 H390" class="blue"/>
+  <path d="M720 295 H750" class="blue"/>
+  <path d="M774 295 H805" class="blue"/>
+  <path d="M1155 295 H1185" class="blue"/>
+  <path d="M1209 295 H1240" class="blue"/>
+  <path d="M1610 295 H1690 V575 H1760" class="orange"/>
+  <text x="1660" y="278" class="small" text-anchor="middle">mem_stage_complete：wbq_enq 写 tail</text>
+  <path d="M2200 290 H2270" class="blue"/>
+  <text x="2235" y="272" class="tiny" text-anchor="middle">head retire</text>
+
+  <!-- Forwarding paths, all ending at EX1. -->
+  <path d="M980 420 V490 H500 V420" class="green"/>
+  <text x="770" y="480" class="small" text-anchor="middle">EX2 已完成的非晚结果</text>
+  <path d="M1425 420 V530 H575 V420" class="green"/>
+  <text x="1050" y="520" class="small" text-anchor="middle">MEM 中可用结果</text>
+  <path d="M1760 215 V118 H650 V170" class="green"/>
+  <text x="1210" y="109" class="small" text-anchor="middle">WBQ latest ready data（未退休也可旁路）</text>
+
+  <!-- Load queue and data cache path. -->
+  <rect x="1230" y="750" width="380" height="220" class="lq"/>
+  <text x="1420" y="791" class="head" text-anchor="middle">LQ（2 项）：load 事务记录</text>
+  <text x="1420" y="824" class="small" text-anchor="middle">PA | size | cached | wbq_slot | discard</text>
+  <line x1="1255" y1="842" x2="1585" y2="842" class="divider"/>
+  <text x="1260" y="875" class="body">count：尚未返回的全部 load</text>
+  <text x="1260" y="908" class="body">issued_count：已 addr_ok、等待 data_ok</text>
+  <text x="1260" y="941" class="small">无标签响应严格属于最老的 issued head</text>
+
+  <rect x="1140" y="1080" width="500" height="190" class="cache"/>
+  <text x="1390" y="1122" class="head" text-anchor="middle">D-cache / uncached bypass</text>
+  <text x="1390" y="1156" class="body" text-anchor="middle">共享的一套 data_sram 类 SRAM 接口</text>
+  <text x="1390" y="1193" class="mono" text-anchor="middle">addr_ok：接受地址；data_ok/rdata：以后返回</text>
+  <text x="1390" y="1230" class="small" text-anchor="middle">load 与 store 的接口所有权由 LQ/SB 状态区分</text>
+
+  <path d="M1390 420 V750" class="orange"/>
+  <text x="1405" y="620" class="small">load 同拍建立 LQ + not-ready WBQ</text>
+  <path d="M1290 970 V1080" class="orange"/>
+  <text x="1175" y="1025" class="small">load req/addr</text>
+  <path d="M1420 1080 V970" class="orange"/>
+  <text x="1400" y="1042" class="tiny" text-anchor="end">addr_ok：issued+1</text>
+  <path d="M1540 1080 V970" class="green"/>
+  <text x="1560" y="1042" class="tiny">data_ok/rdata</text>
+  <path d="M1610 870 H1680 V495 H1760" class="green"/>
+  <text x="1670" y="850" class="small" text-anchor="end">LQ head 读 wbq_slot，回填对应项并置 ready</text>
+
+  <!-- Store buffer path. -->
+  <rect x="1810" y="790" width="390" height="230" class="sb"/>
+  <text x="2005" y="831" class="head" text-anchor="middle">SB（4 项）：已退休 store</text>
+  <text x="2005" y="864" class="small" text-anchor="middle">PA | wdata | wstrb | size | cached</text>
+  <line x1="1835" y1="882" x2="2175" y2="882" class="divider"/>
+  <text x="1840" y="915" class="body">入队后不能被年轻 flush 撤销</text>
+  <text x="1840" y="948" class="body">队首等待 req/addr_ok，再等 data_ok</text>
+  <text x="1840" y="981" class="small">SB 满时才反压 store 退休</text>
+
+  <path d="M1980 680 V790" class="purple"/>
+  <text x="1995" y="742" class="small">WBQ head store 无异常退休：sb_enqueue</text>
+  <path d="M1810 920 H1705 V1155 H1640" class="purple"/>
+  <text x="1660" y="1138" class="small">store req/addr/wdata</text>
+  <path d="M1640 1215 H1745 V970 H1810" class="green"/>
+  <text x="1660" y="1242" class="small">store data_ok：释放 SB head</text>
+
+  <!-- Beginner notes. -->
+  <rect x="50" y="700" width="900" height="280" class="note"/>
+  <text x="80" y="742" class="head">EX 拆级的核心：把“大选择器”和“大运算器”隔开</text>
+  <text x="80" y="784" class="body">未拆分：寄存器号比较 → 多路旁路 → 立即数选择 → ALU/地址/分支，全部挤在一拍。</text>
+  <text x="80" y="826" class="body">EX1：只负责得到可信操作数；晚结果相关时保持消费者，并向 EX2 注入气泡。</text>
+  <text x="80" y="868" class="body">EX2：只对锁存好的操作数计算；乘除未完成或 MEM 反压时保持自身。</text>
+  <text x="80" y="910" class="body">收益是缩短关键组合路径、提高可实现频率；代价是多一级寄存和更复杂的 flush。</text>
+  <text x="80" y="952" class="small">EX1 的方向快修正降低常见误预测罚时；EX2 的完整 next-PC 比较负责最终正确性。</text>
+
+  <rect x="50" y="1010" width="900" height="260" class="warn"/>
+  <text x="80" y="1052" class="head">五个时间点不能混为一谈</text>
+  <text x="80" y="1094" class="body">① EX2 算出结果　② MEM 把责任交给 WBQ/LQ　③ WBQ 项 ready</text>
+  <text x="80" y="1136" class="body">④ WBQ head 退休并产生一次架构副作用　⑤ 已退休 store 在 SB 中真正写完</text>
+  <text x="80" y="1178" class="body">load 可以在②后继续等数据；store 必须到④后才允许进入真正写出路径。</text>
+  <text x="80" y="1220" class="small">年轻 WBQ 项即使 ready 也不能越过 not-ready head；这条规则保证精确异常。</text>
+
+  <text x="50" y="1320" class="tiny">箭头表示事务或数据所有权的方向，不承诺相邻框固定只间隔一个周期；停顿时 valid/payload 留在当前所有者中。</text>
+</svg>

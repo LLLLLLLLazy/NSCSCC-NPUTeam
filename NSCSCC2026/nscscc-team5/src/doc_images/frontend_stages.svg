@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1180" viewBox="0 0 2000 1180">
+  <defs>
+    <style>
+      .title { font: 700 34px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #172033; }
+      .subtitle { font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #4a5568; }
+      .head { font: 700 25px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #172033; }
+      .body { font: 18px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #26344d; }
+      .small { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #40516e; }
+      .tiny { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #52627d; }
+      .mono { font: 16px Consolas, "Microsoft YaHei", monospace; fill: #26344d; }
+      .stage { fill: #eef5ff; stroke: #4d77b3; stroke-width: 3; rx: 16; }
+      .memory { fill: #eefaf4; stroke: #398b62; stroke-width: 3; rx: 16; }
+      .queue { fill: #fff8e8; stroke: #b87920; stroke-width: 3; rx: 16; }
+      .event { fill: #fff1dc; stroke: #dc7a19; stroke-width: 3; rx: 30; }
+      .match { fill: #edf9f0; stroke: #3f9567; stroke-width: 3; rx: 16; }
+      .note { fill: #f7f9fc; stroke: #a7b3c7; stroke-width: 2; rx: 14; }
+      .redirect { fill: #fff1f1; stroke: #c94b4b; stroke-width: 3; rx: 14; }
+      .blue { fill: none; stroke: #3f72af; stroke-width: 4; marker-end: url(#arrow-blue); }
+      .blueDash { fill: none; stroke: #3f72af; stroke-width: 3; stroke-dasharray: 9 7; marker-end: url(#arrow-blue); }
+      .orange { fill: none; stroke: #dd7d18; stroke-width: 4; marker-end: url(#arrow-orange); }
+      .green { fill: none; stroke: #31845b; stroke-width: 4; marker-end: url(#arrow-green); }
+      .redDash { fill: none; stroke: #c94b4b; stroke-width: 4; stroke-dasharray: 10 8; marker-end: url(#arrow-red); }
+      .divider { stroke: #c4cfdd; stroke-width: 2; }
+    </style>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3f72af"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#dd7d18"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#31845b"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c94b4b"/>
+    </marker>
+  </defs>
+
+  <rect width="2000" height="1180" fill="#ffffff"/>
+  <text x="50" y="54" class="title">取指前端放大图：FQ、FT、FI、IFQ 不是同一个“队列”</text>
+  <text x="50" y="87" class="subtitle">按 CPU_top.v 的真实握手绘制：请求向右，数据响应向下再回填 IFQ；旧 epoch 响应只回收、不写新队列</text>
+
+  <line x1="1180" y1="73" x2="1230" y2="73" class="blue"/>
+  <text x="1240" y="79" class="small">PC / 元数据</text>
+  <line x1="1395" y1="73" x2="1445" y2="73" class="orange"/>
+  <text x="1455" y="79" class="small">请求 / 分配</text>
+  <line x1="1615" y1="73" x2="1665" y2="73" class="green"/>
+  <text x="1675" y="79" class="small">响应 / 回填</text>
+
+  <!-- Top-level logical stages. -->
+  <rect x="50" y="150" width="270" height="190" class="stage"/>
+  <text x="185" y="190" class="head" text-anchor="middle">FQ</text>
+  <text x="185" y="219" class="small" text-anchor="middle">Fetch Query（本文按功能解释）</text>
+  <line x1="75" y1="234" x2="295" y2="234" class="divider"/>
+  <text x="75" y="264" class="body">当前虚拟 PC</text>
+  <text x="75" y="293" class="body">BTB / 方向计数器 / RAS</text>
+  <text x="75" y="322" class="body">产生 predicted next PC</text>
+
+  <rect x="390" y="150" width="290" height="190" class="stage"/>
+  <text x="535" y="190" class="head" text-anchor="middle">FT</text>
+  <text x="535" y="219" class="small" text-anchor="middle">Fetch Translation</text>
+  <line x1="415" y1="234" x2="655" y2="234" class="divider"/>
+  <text x="415" y="264" class="body">if_xlate_*_q 保存 PC / 预测</text>
+  <text x="415" y="293" class="body">一拍 TLB；或选择 DA / DMW</text>
+  <text x="415" y="322" class="body">得到 PA、MAT、取指异常</text>
+
+  <rect x="750" y="150" width="290" height="190" class="stage"/>
+  <text x="895" y="190" class="head" text-anchor="middle">FI</text>
+  <text x="895" y="219" class="small" text-anchor="middle">Fetch Issue</text>
+  <line x1="775" y1="234" x2="1015" y2="234" class="divider"/>
+  <text x="775" y="264" class="body">if_issue_*_q 请求保持槽</text>
+  <text x="775" y="293" class="body">req、PA、cached 必须稳定</text>
+  <text x="775" y="322" class="body">等待地址通道 addr_ok</text>
+
+  <rect x="1110" y="150" width="320" height="190" class="memory"/>
+  <text x="1270" y="190" style="font: 700 22px 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif; fill: #172033;" text-anchor="middle">I-cache / uncached bypass</text>
+  <text x="1270" y="224" class="body" text-anchor="middle">类 SRAM 指令接口</text>
+  <text x="1270" y="263" class="mono" text-anchor="middle">addr_ok：只确认地址已接收</text>
+  <text x="1270" y="294" class="mono" text-anchor="middle">data_ok：若干拍后返回数据</text>
+  <text x="1270" y="323" class="small" text-anchor="middle">返回通道没有 transaction ID</text>
+
+  <path d="M320 245 H390" class="blue"/>
+  <text x="355" y="229" class="small" text-anchor="middle">if_pc_launch</text>
+  <path d="M680 245 H750" class="blue"/>
+  <text x="715" y="229" class="small" text-anchor="middle">翻译结果</text>
+
+  <!-- Address request and address acceptance are deliberately opposite arrows. -->
+  <path d="M1040 216 H1110" class="orange"/>
+  <text x="1075" y="198" class="tiny" text-anchor="middle">req + addr</text>
+  <path d="M1110 287 H1040" class="orange"/>
+  <text x="1075" y="315" class="tiny" text-anchor="middle">addr_ok</text>
+
+  <rect x="800" y="405" width="270" height="94" class="event"/>
+  <text x="935" y="442" class="head" text-anchor="middle">if_req_fire</text>
+  <text x="935" y="476" class="mono" text-anchor="middle">req &amp;&amp; addr_ok</text>
+  <path d="M1075 340 V372 H1000 V405" class="orange"/>
+
+  <!-- FT can bypass the FI register when the holding slot is empty. -->
+  <path d="M620 340 C640 400 720 432 800 432" class="blueDash"/>
+  <text x="654" y="391" class="tiny">FI 为空时 direct candidate</text>
+
+  <!-- Request bookkeeping. -->
+  <rect x="850" y="560" width="310" height="150" class="queue"/>
+  <text x="1005" y="599" class="head" text-anchor="middle">IF memory FIFO（8 项）</text>
+  <text x="1005" y="632" class="body" text-anchor="middle">只记录真正发出的请求</text>
+  <text x="1005" y="665" class="mono" text-anchor="middle">slot = IFQ tail</text>
+  <text x="1005" y="694" class="mono" text-anchor="middle">epoch = 当前取指世代</text>
+  <path d="M935 499 V560" class="orange"/>
+  <text x="949" y="536" class="tiny">tail 写入</text>
+
+  <!-- IFQ: allocation enters upper-left; response fill enters lower-left. -->
+  <rect x="1500" y="520" width="400" height="405" class="queue"/>
+  <text x="1700" y="559" class="head" text-anchor="middle">IFQ：Instruction Fetch Queue（8 项）</text>
+  <text x="1700" y="590" class="small" text-anchor="middle">保存程序顺序；只有 ready 的 head 能离开</text>
+  <line x1="1525" y1="608" x2="1875" y2="608" class="divider"/>
+  <rect x="1535" y="626" width="330" height="46" fill="#e8f7ed" stroke="#55a374" stroke-width="2" rx="8"/>
+  <text x="1552" y="655" class="mono">head: PC | instr | pred | ex | ready</text>
+  <rect x="1535" y="680" width="330" height="40" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1552" y="706" class="mono">slot 1: PC | ... | ready?</text>
+  <rect x="1535" y="728" width="330" height="40" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1552" y="754" class="mono">slot 2: PC | ... | ready?</text>
+  <text x="1700" y="796" class="head" text-anchor="middle">⋮</text>
+  <rect x="1535" y="815" width="330" height="40" fill="#fffdf6" stroke="#d7b77b" stroke-width="1.5" rx="7"/>
+  <text x="1552" y="841" class="mono">tail: 分配下一项的位置</text>
+  <text x="1700" y="889" class="small" text-anchor="middle">取指异常：不发请求，直接分配 ready 项</text>
+
+  <path d="M1070 452 H1450 V835 H1500" class="orange"/>
+  <text x="1260" y="438" class="small" text-anchor="middle">同一次 req_fire：IFQ tail 分配，初始 ready=0</text>
+
+  <!-- Response matching: data comes from memory; slot and epoch come from FIFO head. -->
+  <rect x="1080" y="790" width="350" height="135" class="match"/>
+  <text x="1255" y="828" class="head" text-anchor="middle">响应匹配与 epoch 检查</text>
+  <text x="1255" y="861" class="mono" text-anchor="middle">rdata + FIFO.head.slot</text>
+  <text x="1255" y="893" class="body" text-anchor="middle">当前 epoch 才写 instr 并置 ready</text>
+  <path d="M1300 340 V790" class="green"/>
+  <text x="1280" y="470" class="small" text-anchor="end">data_ok + rdata</text>
+  <path d="M1005 710 V858 H1080" class="green"/>
+  <text x="870" y="752" class="small">FIFO head 给出 slot / epoch</text>
+  <path d="M1430 857 H1465 V790 H1500" class="green"/>
+  <text x="1450" y="775" class="tiny" text-anchor="middle">按 slot 回填</text>
+
+  <!-- Frontend consumer. -->
+  <rect x="1500" y="990" width="400" height="125" class="stage"/>
+  <text x="1700" y="1032" class="head" text-anchor="middle">IF/ID 寄存器 → ID 译码</text>
+  <text x="1700" y="1066" class="body" text-anchor="middle">ifq_pop = head.ready &amp;&amp; IF_ID_En</text>
+  <text x="1700" y="1096" class="small" text-anchor="middle">PC、指令、预测、异常作为一整包交给 ID</text>
+  <path d="M1700 925 V990" class="blue"/>
+
+  <!-- Explanatory notes and redirect path. -->
+  <rect x="50" y="470" width="650" height="420" class="note"/>
+  <text x="80" y="512" class="head">三个必须分开的概念</text>
+  <text x="80" y="554" class="body">① FQ：当前 PC 的组合查询/预测功能，不是八项队列。</text>
+  <text x="80" y="596" class="body">② FI：一个请求保持槽；addr_ok=0 时不能换地址。</text>
+  <text x="80" y="638" class="body">③ IFQ：真正的八项顺序取指完成队列。</text>
+  <line x1="80" y1="669" x2="670" y2="669" class="divider"/>
+  <text x="80" y="711" class="head">为什么另有 IF memory FIFO？</text>
+  <text x="80" y="753" class="body">IFQ 记录“程序中有哪些取指项”，包括不访问 cache 的异常项。</text>
+  <text x="80" y="795" class="body">在途 FIFO 记录“哪些存储请求将来还会返回”，并保存 IFQ slot。</text>
+  <text x="80" y="837" class="body">返回通道没有 ID，只能用最老 FIFO 项为 data_ok 找到归属。</text>
+  <text x="80" y="871" class="small">结论：请求接受时分配；数据返回时回填；队首 ready 时才译码。</text>
+
+  <rect x="50" y="960" width="650" height="155" class="redirect"/>
+  <text x="80" y="1000" class="head">redirect：分支误预测 / 异常 / ERTN</text>
+  <text x="80" y="1037" class="body">正确 PC 送回 FQ；epoch++；清除年轻 FT、FI、IFQ 状态。</text>
+  <text x="80" y="1074" class="body">已发出的旧请求不能撤销：响应仍弹 FIFO，但 epoch 不同就不回填。</text>
+  <path d="M85 960 H25 V245 H50" class="redDash"/>
+
+  <text x="50" y="1155" class="tiny">注意：箭头表示所有权或事务的真实方向，不表示两端之间固定只花一拍。</text>
+</svg>

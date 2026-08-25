@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1080" viewBox="0 0 1900 1080">
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#ea580c"/></marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#7c3aed"/></marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .subtitle{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .group{font:700 20px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155}
+      .block-title{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#10233d;text-anchor:middle}
+      .block-text{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .small{font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .label{font:700 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a8a}
+      .stage{stroke:#93a4ba;stroke-width:2;rx:14}
+      .boundary{fill:#334155;rx:4}
+      .main-arrow{stroke:#2563eb;stroke-width:5;fill:none;marker-end:url(#arrow-blue)}
+      .load-arrow{stroke:#ea580c;stroke-width:4;fill:none;marker-end:url(#arrow-orange)}
+      .store-arrow{stroke:#7c3aed;stroke-width:4;fill:none;marker-end:url(#arrow-purple)}
+      .redirect{stroke:#dc2626;stroke-width:4;fill:none;stroke-dasharray:10 7;marker-end:url(#arrow-red)}
+    </style>
+  </defs>
+
+  <rect width="1900" height="1080" fill="#f8fafc"/>
+  <text x="70" y="58" class="title">myCPU 流水线总览：顺序主干 + 队列化访存 + 精确退休</text>
+  <text x="70" y="91" class="subtitle">蓝色是指令主路径；橙色是 load 的异步返回；紫色是已退休 store；红色虚线是控制流恢复</text>
+
+  <rect x="45" y="125" width="625" height="270" rx="20" fill="#eaf3ff" stroke="#7fb2f5" stroke-width="2"/>
+  <rect x="690" y="125" width="625" height="270" rx="20" fill="#edfdf8" stroke="#79c8b8" stroke-width="2"/>
+  <rect x="1335" y="125" width="520" height="270" rx="20" fill="#fff7ed" stroke="#f4ad72" stroke-width="2"/>
+  <text x="65" y="155" class="group">前端：预测、翻译、取指与排队</text>
+  <text x="710" y="155" class="group">顺序执行主干：译码、旁路与运算</text>
+  <text x="1355" y="155" class="group">访存与顺序退休</text>
+
+  <rect x="65" y="190" width="160" height="145" class="stage" fill="#dbeafe"/>
+  <text x="145" y="224" class="block-title">PC / 预测</text>
+  <text x="145" y="255" class="block-text">BTB + 方向表</text>
+  <text x="145" y="280" class="block-text">RAS</text>
+  <text x="145" y="305" class="block-text">产生 Next_PC</text>
+
+  <rect x="260" y="190" width="160" height="145" class="stage" fill="#dbeafe"/>
+  <text x="340" y="224" class="block-title">FT</text>
+  <text x="340" y="255" class="block-text">取指地址翻译</text>
+  <text x="340" y="280" class="block-text">TLB s0 / DMW</text>
+  <text x="340" y="305" class="block-text">保存 PC 上下文</text>
+
+  <rect x="455" y="190" width="190" height="145" class="stage" fill="#dbeafe"/>
+  <text x="550" y="224" class="block-title">FI / IFQ</text>
+  <text x="550" y="255" class="block-text">发 ICache 请求</text>
+  <text x="550" y="280" class="block-text">IF memory FIFO</text>
+  <text x="550" y="305" class="block-text">按 epoch 收响应</text>
+
+  <rect x="710" y="190" width="165" height="145" class="stage" fill="#d1fae5"/>
+  <text x="792" y="224" class="block-title">ID</text>
+  <text x="792" y="255" class="block-text">译码 / 读 GPR</text>
+  <text x="792" y="280" class="block-text">立即数 / 异常初判</text>
+  <text x="792" y="305" class="block-text">建立控制字段</text>
+
+  <rect x="915" y="190" width="165" height="145" class="stage" fill="#d1fae5"/>
+  <text x="997" y="224" class="block-title">EX1</text>
+  <text x="997" y="255" class="block-text">最新写者旁路</text>
+  <text x="997" y="280" class="block-text">源操作数定稿</text>
+  <text x="997" y="305" class="block-text">条件分支快修正</text>
+
+  <rect x="1120" y="190" width="165" height="145" class="stage" fill="#d1fae5"/>
+  <text x="1202" y="224" class="block-title">EX2</text>
+  <text x="1202" y="255" class="block-text">ALU / 乘除</text>
+  <text x="1202" y="280" class="block-text">VA / 实际 Next_PC</text>
+  <text x="1202" y="305" class="block-text">完整误预测核验</text>
+
+  <rect x="1360" y="190" width="190" height="145" class="stage" fill="#ffedd5"/>
+  <text x="1455" y="224" class="block-title">MEM</text>
+  <text x="1455" y="255" class="block-text">数据地址翻译</text>
+  <text x="1455" y="280" class="block-text">分配 LQ / WBQ</text>
+  <text x="1455" y="305" class="block-text">普通结果入队</text>
+
+  <rect x="1595" y="190" width="235" height="145" class="stage" fill="#ffedd5"/>
+  <text x="1712" y="224" class="block-title">WBQ / 退休</text>
+  <text x="1712" y="255" class="block-text">四项、严格看队首</text>
+  <text x="1712" y="280" class="block-text">写 GPR / CSR / TLB</text>
+  <text x="1712" y="305" class="block-text">store 进入 SB</text>
+
+  <path d="M225 262H252" class="main-arrow"/>
+  <path d="M420 262H447" class="main-arrow"/>
+  <path d="M645 262H700" class="main-arrow"/>
+  <path d="M875 262H905" class="main-arrow"/>
+  <path d="M1080 262H1110" class="main-arrow"/>
+  <path d="M1285 262H1350" class="main-arrow"/>
+  <path d="M1550 262H1585" class="main-arrow"/>
+
+  <rect x="684" y="180" width="11" height="165" class="boundary"/><text x="678" y="367" class="small" text-anchor="end">IF_ID</text>
+  <rect x="889" y="180" width="11" height="165" class="boundary"/><text x="895" y="367" class="small" text-anchor="middle">ID_EX</text>
+  <rect x="1094" y="180" width="11" height="165" class="boundary"/><text x="1099" y="367" class="small" text-anchor="middle">EX1_EX2</text>
+  <rect x="1325" y="180" width="11" height="165" class="boundary"/><text x="1330" y="367" class="small" text-anchor="middle">EX_MEM</text>
+
+  <text x="70" y="447" class="group">取指与数据事务可以离开主流水线等待，身份由队列保存</text>
+
+  <rect x="110" y="485" width="260" height="110" rx="14" fill="#e0f2fe" stroke="#38a3d1" stroke-width="2"/>
+  <text x="240" y="520" class="block-title">ICache / bypass</text>
+  <text x="240" y="550" class="block-text">addr_ok 接收；稍后 data_ok</text>
+  <text x="240" y="575" class="block-text">错误 epoch 响应只回收</text>
+  <path d="M550 335C550 420 330 410 280 477" class="main-arrow"/>
+  <path d="M240 485C300 430 455 415 520 345" class="main-arrow"/>
+
+  <rect x="765" y="485" width="230" height="120" rx="14" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text x="880" y="520" class="block-title">LQ（两项）</text>
+  <text x="880" y="550" class="block-text">保存 load 身份</text>
+  <text x="880" y="575" class="block-text">issued / discard / WBQ id</text>
+
+  <rect x="1080" y="485" width="260" height="120" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="1210" y="520" class="block-title">DCache / bypass</text>
+  <text x="1210" y="550" class="block-text">命中、MSHR、refill</text>
+  <text x="1210" y="575" class="block-text">返回 load 或完成 store</text>
+
+  <rect x="1500" y="485" width="250" height="120" rx="14" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="1625" y="520" class="block-title">SB（已退休 store）</text>
+  <text x="1625" y="550" class="block-text">保存地址、数据、wstrb</text>
+  <text x="1625" y="575" class="block-text">稍后获得 data 端口</text>
+
+  <path d="M1455 335C1455 410 970 420 900 477" class="load-arrow"/>
+  <path d="M995 545H1070" class="load-arrow"/>
+  <path d="M1080 575C1035 650 940 650 900 615" class="load-arrow"/>
+  <path d="M995 515C1200 420 1510 420 1660 345" class="load-arrow"/>
+  <text x="1280" y="432" class="label" fill="#ea580c">load data_ok → LQ 格式化 → WBQ 对应项 ready</text>
+
+  <path d="M1712 335V477" class="store-arrow"/>
+  <path d="M1500 545H1350" class="store-arrow"/>
+  <text x="1515" y="463" class="small">store 只有退休后才产生写副作用</text>
+
+  <rect x="1030" y="760" width="360" height="135" rx="16" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="1210" y="797" class="block-title">控制流核验与恢复</text>
+  <text x="1210" y="829" class="block-text">EX1：条件方向快修正</text>
+  <text x="1210" y="855" class="block-text">EX2：比较完整 predicted / actual PC</text>
+  <text x="1210" y="881" class="block-text">flush 年轻状态；epoch 使迟到取指失效</text>
+  <path d="M997 335C997 620 1110 665 1160 750" class="redirect"/>
+  <path d="M1202 335V750" class="redirect"/>
+  <path d="M1030 825C500 825 25 790 25 620V262H65" class="redirect"/>
+
+  <path d="M1712 335C1815 440 1810 825 1398 825" class="redirect"/>
+  <text x="1570" y="782" class="small">异常 / ERTN / 串行化 refetch 优先级更高</text>
+
+  <rect x="70" y="944" width="1760" height="88" rx="14" fill="#eef2f7" stroke="#c5cfdb"/>
+  <text x="95" y="976" class="group">读图关键</text>
+  <text x="215" y="976" class="small">主干每拍最多接收一条，但 load、取指响应可以在队列中等待；WBQ 只从最老队首退休，所以“内部并发”不会变成“乱序架构副作用”。</text>
+  <text x="215" y="1008" class="small">任何停顿都应解释为：下一级不能接收、结果尚未 ready、队列已满或串行化事件正在排空；任何 flush 都只杀年轻状态。</text>
+</svg>

@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1180" viewBox="0 0 1900 1180">
+  <defs>
+    <marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7c3aed"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .sub{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .head{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .note{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .label{font:700 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a8a}
+      .box{stroke-width:2;rx:15}
+      .read{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#aa)}
+      .write{stroke:#7c3aed;stroke-width:4;fill:none;marker-end:url(#aw)}
+    </style>
+  </defs>
+  <rect width="1900" height="1180" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">sram_axi_bridge_2x1：把本地请求变成可反压、可并发的 AXI 事务</text>
+  <text x="60" y="91" class="sub">本地接口用 req/addr_ok/data_ok；AXI 用五个彼此独立的 VALID/READY 通道，bridge 必须保存中间所有权</text>
+
+  <rect x="45" y="125" width="1810" height="445" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="75" y="162" class="label">数据通路总览</text>
+  <rect x="80" y="205" width="280" height="305" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="220" y="245" class="head">本地来源</text>
+  <text x="220" y="285" class="txt">ICache refill（id 0/1）</text>
+  <text x="220" y="316" class="txt">DCache refill / writeback</text>
+  <text x="220" y="347" class="txt">取指 bypass</text>
+  <text x="220" y="378" class="txt">load/store bypass</text>
+  <line x1="110" y1="405" x2="330" y2="405" stroke="#bfdbfe" stroke-width="2"/>
+  <text x="220" y="438" class="txt">cached read：4 beat WRAP</text>
+  <text x="220" y="469" class="txt">bypass：1 beat INCR</text>
+
+  <rect x="455" y="190" width="360" height="335" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="635" y="230" class="head">bridge 上下文与仲裁</text>
+  <text x="635" y="270" class="txt">I read context ×2</text>
+  <text x="635" y="301" class="txt">D read context ×2</text>
+  <text x="635" y="332" class="txt">每侧 return-order FIFO</text>
+  <text x="635" y="363" class="txt">单 write context</text>
+  <line x1="495" y1="392" x2="775" y2="392" stroke="#bae6fd" stroke-width="2"/>
+  <text x="635" y="426" class="txt">AR：I/D pending context 仲裁</text>
+  <text x="635" y="457" class="txt">R：RID → 侧 FIFO → 本地 slot</text>
+  <text x="635" y="488" class="txt">AW/W：分别保持到各自 fire</text>
+
+  <rect x="925" y="165" width="455" height="380" class="box" fill="#f1f5f9" stroke="#64748b"/>
+  <text x="1152" y="205" class="head">AXI 五个独立通道</text>
+  <rect x="975" y="240" width="350" height="50" rx="8" fill="#dbeafe" stroke="#2563eb"/><text x="1150" y="272" class="txt">AR：读地址 / LEN / SIZE / BURST / ID</text>
+  <rect x="975" y="305" width="350" height="50" rx="8" fill="#dbeafe" stroke="#2563eb"/><text x="1150" y="337" class="txt">R：RID / DATA / RESP / LAST</text>
+  <rect x="975" y="370" width="350" height="50" rx="8" fill="#ede9fe" stroke="#7c3aed"/><text x="1150" y="402" class="txt">AW：写地址 / 属性 / ID</text>
+  <rect x="975" y="435" width="350" height="50" rx="8" fill="#ede9fe" stroke="#7c3aed"/><text x="1150" y="467" class="txt">W：DATA / STRB / LAST / WID</text>
+  <rect x="975" y="500" width="350" height="35" rx="8" fill="#ede9fe" stroke="#7c3aed"/><text x="1150" y="525" class="txt">B：BID / BRESP</text>
+
+  <rect x="1490" y="205" width="300" height="305" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="1640" y="245" class="head">AXI Slave / 互连</text>
+  <text x="1640" y="285" class="txt">DDR / RAM / MMIO</text>
+  <text x="1640" y="325" class="txt">READY 可任意停顿</text>
+  <text x="1640" y="356" class="txt">RVALID 可延迟和分拍</text>
+  <text x="1640" y="387" class="txt">AWREADY/WREADY 可错拍</text>
+  <text x="1640" y="418" class="txt">BVALID 最后确认写完成</text>
+  <text x="1640" y="465" class="txt">板级 ID：0=I，1=D</text>
+
+  <path d="M360 300H445" class="read"/><path d="M815 265H915" class="read"/><path d="M1380 265H1480" class="read"/>
+  <path d="M1490 330H1390" class="read"/><path d="M925 330H825" class="read"/><path d="M455 350H370" class="read"/>
+  <path d="M360 440H445" class="write"/>
+  <path d="M815 395H915" class="write"/><path d="M1380 395H1480" class="write"/>
+  <path d="M815 460H915" class="write"/><path d="M1380 460H1480" class="write"/>
+  <path d="M1490 517H1390" class="write"/><path d="M925 517H825" class="write"/><path d="M455 480H370" class="write"/>
+
+  <rect x="45" y="610" width="885" height="485" rx="22" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="75" y="650" class="label">读 context：地址只发一次，所有 R beat 都要找到原 owner</text>
+  <g fill="#dbeafe" stroke="#2563eb">
+    <rect x="85" y="705" width="210" height="110" class="box"/>
+    <rect x="360" y="705" width="230" height="110" class="box"/>
+    <rect x="655" y="705" width="225" height="110" class="box"/>
+  </g>
+  <text x="190" y="742" class="head">FREE</text><text x="190" y="775" class="txt">可接收本地 req</text><text x="190" y="801" class="txt">复制来源/地址/属性</text>
+  <text x="475" y="742" class="head">PENDING_AR</text><text x="475" y="775" class="txt">等待 AR 仲裁</text><text x="475" y="801" class="txt">VALID&amp;&amp;!READY 时 payload 稳定</text>
+  <text x="767" y="742" class="head">WAIT_R</text><text x="767" y="775" class="txt">按 RID+FIFO 路由 beat</text><text x="767" y="801" class="txt">RLAST 才释放 context</text>
+  <path d="M295 760H350" class="read"/>
+  <path d="M590 760H645" class="read"/>
+  <text x="322" y="738" class="note">addr_ok</text><text x="610" y="738" class="note">AR fire</text>
+  <path d="M767 705C767 675 190 675 190 695" class="read"/>
+  <text x="485" y="672" class="note" text-anchor="middle">RLAST：释放 context，回到 FREE</text>
+
+  <rect x="90" y="870" width="790" height="165" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="485" y="907" class="head">为什么每侧需要 return-order FIFO</text>
+  <text x="485" y="944" class="txt">ICache/L2 的本地 MSHR slot0、slot1 进入板级后都只能使用同一个 I 侧 RID=0</text>
+  <text x="485" y="974" class="txt">每次 AR fire 把本地 slot 压 FIFO；R 返回时取 FIFO 队首恢复 slot；RLAST 时 pop</text>
+  <text x="485" y="1004" class="txt">RID 区分 I 与 D，FIFO 区分同一侧的先后本地事务，两者缺一不可</text>
+
+  <rect x="970" y="610" width="885" height="485" rx="22" fill="#faf5ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="1000" y="650" class="label" fill="#6b21a8">写 context：AW、W、B 是三个阶段，不是一个“大握手”</text>
+  <g fill="#f3e8ff" stroke="#7c3aed">
+    <rect x="1015" y="705" width="190" height="110" class="box"/>
+    <rect x="1265" y="705" width="250" height="110" class="box"/>
+    <rect x="1575" y="705" width="220" height="110" class="box"/>
+  </g>
+  <text x="1110" y="742" class="head">FREE</text><text x="1110" y="775" class="txt">复制写 payload</text><text x="1110" y="801" class="txt">awvalid=wvalid=1</text>
+  <text x="1390" y="742" class="head">SEND AW / W</text><text x="1390" y="775" class="txt">谁 fire 只清谁的 valid</text><text x="1390" y="801" class="txt">二者都清后 bready=1</text>
+  <text x="1685" y="742" class="head">WAIT_B</text><text x="1685" y="775" class="txt">B fire 才算写完成</text><text x="1685" y="801" class="txt">按来源返回 data_ok</text>
+  <path d="M1205 760H1255" class="write"/>
+  <path d="M1515 760H1565" class="write"/>
+  <path d="M1685 705C1685 675 1110 675 1110 695" class="write"/>
+  <text x="1400" y="672" class="note" text-anchor="middle">cached / MMIO：B fire 后回 FREE</text>
+
+  <rect x="1015" y="870" width="780" height="165" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="1405" y="907" class="head">RAM bypass store 的额外 SNOOP 阶段</text>
+  <text x="1405" y="944" class="txt">AXI B 完成 → 等 ICache 与 clean L2 quiescent → 按 wstrb 更新/失效命中 word</text>
+  <text x="1405" y="974" class="txt">两个 snoop 都完成后才向 CPU data_ok，防止自修改代码继续读取旧指令</text>
+  <text x="1405" y="1004" class="txt">MMIO store 不走该路径；这是项目内定向一致性，不是完整 MESI 协议</text>
+  <path d="M1685 815V860" class="write"/>
+  <text x="1715" y="846" class="note">RAM bypass</text>
+  <path d="M1100 870C990 855 990 760 1005 760" class="write"/>
+
+  <rect x="60" y="1125" width="1780" height="42" rx="10" fill="#e2e8f0"/>
+  <text x="80" y="1153" class="note">唯一握手公式始终是 fire=VALID&amp;&amp;READY。VALID=1 且 READY=0 时地址、数据、ID、LEN、SIZE、BURST、STRB、LAST 都必须保持不变。</text>
+</svg>

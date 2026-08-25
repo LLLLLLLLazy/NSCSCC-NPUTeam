@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120">
+  <defs>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ea580c"/></marker>
+    <marker id="ap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7c3aed"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <style>
+      .title{font:700 34px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#132238}
+      .sub{font:400 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .lane-title{font:700 24px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e293b}
+      .node-title{font:700 18px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .node-text{font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569;text-anchor:middle}
+      .note{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:13}
+    </style>
+  </defs>
+  <rect width="1800" height="1120" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">四类指令在同一条流水线中的不同生命期</text>
+  <text x="60" y="91" class="sub">箭头表示所有权转移，不表示每段都固定只用一拍；停顿时节点中的 valid 和 payload 必须保持</text>
+
+  <rect x="40" y="125" width="1720" height="205" rx="20" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="70" y="165" class="lane-title">A. add.w：结果在 EX2 已经算出，MEM 只负责入 ready WBQ</text>
+  <g fill="#dbeafe" stroke="#2563eb">
+    <rect x="90" y="205" width="180" height="85" class="box"/><rect x="330" y="205" width="180" height="85" class="box"/>
+    <rect x="570" y="205" width="180" height="85" class="box"/><rect x="810" y="205" width="180" height="85" class="box"/>
+    <rect x="1050" y="205" width="210" height="85" class="box"/><rect x="1320" y="205" width="330" height="85" class="box"/>
+  </g>
+  <text x="180" y="237" class="node-title">PC / IFQ</text><text x="180" y="267" class="node-text">取得 add.w</text>
+  <text x="420" y="237" class="node-title">ID</text><text x="420" y="267" class="node-text">读 rj/rk、译码</text>
+  <text x="660" y="237" class="node-title">EX1</text><text x="660" y="267" class="node-text">旁路得到最新源</text>
+  <text x="900" y="237" class="node-title">EX2</text><text x="900" y="267" class="node-text">ALU 相加</text>
+  <text x="1155" y="237" class="node-title">MEM → WBQ</text><text x="1155" y="267" class="node-text">分配 ready 项</text>
+  <text x="1485" y="237" class="node-title">WBQ 队首退休</text><text x="1485" y="267" class="node-text">Write_En=1，写 rd；年轻指令可从 WBQ 旁路</text>
+  <path d="M270 248H320" stroke="#2563eb" stroke-width="4" marker-end="url(#ab)"/>
+  <path d="M510 248H560" stroke="#2563eb" stroke-width="4" marker-end="url(#ab)"/>
+  <path d="M750 248H800" stroke="#2563eb" stroke-width="4" marker-end="url(#ab)"/>
+  <path d="M990 248H1040" stroke="#2563eb" stroke-width="4" marker-end="url(#ab)"/>
+  <path d="M1260 248H1310" stroke="#2563eb" stroke-width="4" marker-end="url(#ab)"/>
+
+  <rect x="40" y="350" width="1720" height="240" rx="20" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="70" y="390" class="lane-title">B. ld.w miss：指令离开 MEM，但 WBQ 项要等异步数据</text>
+  <g fill="#ffedd5" stroke="#ea580c">
+    <rect x="90" y="435" width="180" height="95" class="box"/><rect x="330" y="435" width="180" height="95" class="box"/>
+    <rect x="570" y="435" width="210" height="95" class="box"/><rect x="840" y="435" width="245" height="95" class="box"/>
+    <rect x="1145" y="435" width="235" height="95" class="box"/><rect x="1440" y="435" width="210" height="95" class="box"/>
+  </g>
+  <text x="180" y="468" class="node-title">EX2</text><text x="180" y="497" class="node-text">计算虚地址 VA</text>
+  <text x="420" y="468" class="node-title">MEM / MMU</text><text x="420" y="497" class="node-text">得到 PA、权限、MAT</text>
+  <text x="675" y="468" class="node-title">同时分配</text><text x="675" y="497" class="node-text">LQ + not-ready WBQ</text>
+  <text x="962" y="468" class="node-title">DCache MSHR</text><text x="962" y="497" class="node-text">AXI refill；主干可做别的指令</text>
+  <text x="1262" y="468" class="node-title">critical data_ok</text><text x="1262" y="497" class="node-text">LQ 格式化并填 WBQ</text>
+  <text x="1545" y="468" class="node-title">顺序退休</text><text x="1545" y="497" class="node-text">轮到队首才写 GPR</text>
+  <path d="M270 482H320" stroke="#ea580c" stroke-width="4" marker-end="url(#ao)"/>
+  <path d="M510 482H560" stroke="#ea580c" stroke-width="4" marker-end="url(#ao)"/>
+  <path d="M780 482H830" stroke="#ea580c" stroke-width="4" marker-end="url(#ao)"/>
+  <path d="M1085 482H1135" stroke="#ea580c" stroke-width="4" marker-end="url(#ao)"/>
+  <path d="M1380 482H1430" stroke="#ea580c" stroke-width="4" marker-end="url(#ao)"/>
+  <text x="675" y="558" class="note" text-anchor="middle">WBQ id 绑定 load 身份</text>
+  <text x="1110" y="558" class="note" text-anchor="middle">等待时间不是“流水级固定延迟”</text>
+
+  <rect x="40" y="610" width="1720" height="230" rx="20" fill="#faf5ff" stroke="#c4b5fd"/>
+  <text x="70" y="650" class="lane-title">C. st.w：地址可早算，但对存储系统的写必须晚到退休之后</text>
+  <g fill="#f3e8ff" stroke="#7c3aed">
+    <rect x="90" y="695" width="210" height="95" class="box"/><rect x="360" y="695" width="230" height="95" class="box"/>
+    <rect x="650" y="695" width="250" height="95" class="box"/><rect x="960" y="695" width="230" height="95" class="box"/>
+    <rect x="1250" y="695" width="400" height="95" class="box"/>
+  </g>
+  <text x="195" y="728" class="node-title">EX2 / MEM</text><text x="195" y="757" class="node-text">算地址、翻译、保存 wstrb</text>
+  <text x="475" y="728" class="node-title">WBQ store 项</text><text x="475" y="757" class="node-text">尚未写 Cache</text>
+  <text x="775" y="728" class="node-title">队首且无异常</text><text x="775" y="757" class="node-text">提交到 Store Buffer</text>
+  <text x="1075" y="728" class="node-title">SB 等端口</text><text x="1075" y="757" class="node-text">此后年轻 flush 不删除</text>
+  <text x="1450" y="728" class="node-title">DCache / bypass 完成</text><text x="1450" y="757" class="node-text">命中置 dirty；miss refill；MMIO 等 B 响应</text>
+  <path d="M300 742H350" stroke="#7c3aed" stroke-width="4" marker-end="url(#ap)"/>
+  <path d="M590 742H640" stroke="#7c3aed" stroke-width="4" marker-end="url(#ap)"/>
+  <path d="M900 742H950" stroke="#7c3aed" stroke-width="4" marker-end="url(#ap)"/>
+  <path d="M1190 742H1240" stroke="#7c3aed" stroke-width="4" marker-end="url(#ap)"/>
+  <text x="775" y="816" class="note" text-anchor="middle">精确异常的分界线：退休以前可撤销，退休以后必须最终完成</text>
+
+  <rect x="40" y="860" width="1720" height="210" rx="20" fill="#fef2f2" stroke="#fca5a5"/>
+  <text x="70" y="900" class="lane-title">D. 条件分支误预测：错误路径可被取回，但不能产生架构副作用</text>
+  <g fill="#fee2e2" stroke="#dc2626">
+    <rect x="90" y="940" width="230" height="85" class="box"/><rect x="390" y="940" width="230" height="85" class="box"/>
+    <rect x="690" y="940" width="230" height="85" class="box"/><rect x="990" y="940" width="250" height="85" class="box"/>
+    <rect x="1310" y="940" width="340" height="85" class="box"/>
+  </g>
+  <text x="205" y="972" class="node-title">PC 按预测继续取</text><text x="205" y="1000" class="node-text">错误路径带同一旧 epoch</text>
+  <text x="505" y="972" class="node-title">EX1 得到真实方向</text><text x="505" y="1000" class="node-text">方向错可先快修正</text>
+  <text x="805" y="972" class="node-title">EX2 仍完整核验</text><text x="805" y="1000" class="node-text">比较完整 Next_PC</text>
+  <text x="1115" y="972" class="node-title">redirect + flush</text><text x="1115" y="1000" class="node-text">EX1 或 EX2 发出；epoch 加一</text>
+  <text x="1480" y="972" class="node-title">从正确 PC 重取</text><text x="1480" y="1000" class="node-text">旧响应仍可返回，但只回收不进入 IFQ</text>
+  <path d="M320 982H380" stroke="#dc2626" stroke-width="4" stroke-dasharray="10 6" marker-end="url(#ar)"/>
+  <path d="M620 982H680" stroke="#dc2626" stroke-width="4" stroke-dasharray="10 6" marker-end="url(#ar)"/>
+  <path d="M920 982H980" stroke="#dc2626" stroke-width="4" stroke-dasharray="10 6" marker-end="url(#ar)"/>
+  <path d="M1240 982H1300" stroke="#dc2626" stroke-width="4" stroke-dasharray="10 6" marker-end="url(#ar)"/>
+  <path d="M505 1025C650 1060 1000 1060 1115 1035" stroke="#dc2626" stroke-width="3" fill="none" stroke-dasharray="8 6" marker-end="url(#ar)"/>
+  <text x="810" y="1055" class="node-text">条件方向错误的 EX1 快恢复路径</text>
+  <text x="60" y="1100" class="sub">共同原则：数据可以提前产生，事务可以后台等待，但 GPR/CSR/TLB/store 等架构副作用只能由正确路径的 WBQ 队首触发。</text>
+</svg>

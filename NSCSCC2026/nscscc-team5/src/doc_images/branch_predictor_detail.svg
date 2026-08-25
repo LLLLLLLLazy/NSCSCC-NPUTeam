@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1640" viewBox="0 0 2400 1640">
+  <defs>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+    <marker id="arrPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7c3aed"/></marker>
+    <marker id="arrOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ea580c"/></marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#059669"/></marker>
+    <style>
+      .title{font:700 36px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#102033}
+      .subtitle{font:400 19px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#526175}
+      .bandtitle{font:700 22px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#1e3a5f}
+      .head{font:700 23px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}
+      .txt{font:400 17px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .small{font:400 15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569;text-anchor:middle}
+      .label{font:700 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155;text-anchor:middle}
+      .left{font:400 16px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#334155}
+      .box{stroke-width:2.2}
+      .blueLine{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#arrBlue)}
+      .purpleLine{stroke:#7c3aed;stroke-width:4;fill:none;marker-end:url(#arrPurple)}
+      .orangeLine{stroke:#ea580c;stroke-width:4;fill:none;marker-end:url(#arrOrange)}
+      .redLine{stroke:#dc2626;stroke-width:4.5;fill:none;stroke-dasharray:12 8;marker-end:url(#arrRed)}
+      .greenLine{stroke:#059669;stroke-width:4;fill:none;marker-end:url(#arrGreen)}
+      .thin{stroke:#94a3b8;stroke-width:2;fill:none}
+    </style>
+  </defs>
+
+  <rect width="2400" height="1640" fill="#f8fafc"/>
+  <text x="55" y="56" class="title">myCPU 分支预测器内部架构：查询、携带、核验、恢复与训练</text>
+  <text x="55" y="91" class="subtitle">蓝色是 FQ 查询；紫色是预测元数据随指令前进；橙色是真实执行；红色恢复正确 PC；绿色只训练未来预测</text>
+
+  <!-- FQ query band -->
+  <rect x="35" y="120" width="2330" height="650" rx="24" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="65" y="158" class="bandtitle">① FQ 查询路径：当前 PC 同时查询 BTB、逻辑 BHT/PHT 和 RAS，组合出预测下一 PC</text>
+
+  <rect x="70" y="285" width="190" height="130" rx="15" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="165" y="327" class="head">当前 PC</text>
+  <text x="165" y="363" class="txt">例如 0x1C001100</text>
+  <text x="165" y="392" class="small">FQ 每次只查询一个 PC</text>
+
+  <rect x="315" y="235" width="250" height="230" rx="15" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="440" y="274" class="head">地址拆分</text>
+  <text x="440" y="312" class="txt">index = PC[8:2]</text>
+  <text x="440" y="342" class="small">7 位，选择 128 项之一</text>
+  <line x1="345" y1="364" x2="535" y2="364" class="thin"/>
+  <text x="440" y="397" class="txt">tag = PC[31:9]</text>
+  <text x="440" y="427" class="small">23 位，确认是不是同一 PC</text>
+
+  <rect x="640" y="190" width="440" height="260" rx="16" class="box" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="860" y="229" class="head">BTB：128 项直接映射</text>
+  <text x="860" y="263" class="txt">读出 valid、tag、target、type</text>
+  <rect x="675" y="290" width="370" height="54" rx="8" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="860" y="324" class="small">valid 且 stored_tag = PC[31:9] 才算 hit</text>
+  <text x="860" y="377" class="small">type：条件 / 直接 / call / return / 间接</text>
+  <text x="860" y="408" class="small">职责：识别控制流，并给出曾经学到的目标</text>
+
+  <rect x="640" y="500" width="220" height="190" rx="16" class="box" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="750" y="539" class="head">逻辑 BHT</text>
+  <text x="750" y="576" class="txt">history = bit[4]</text>
+  <text x="750" y="606" class="small">保存这个索引上次</text>
+  <text x="750" y="630" class="small">实际跳 / 不跳</text>
+  <text x="750" y="665" class="small">本设计不是独立数组</text>
+
+  <rect x="925" y="500" width="330" height="190" rx="16" class="box" fill="#ecfeff" stroke="#0891b2"/>
+  <text x="1090" y="539" class="head">逻辑 PHT</text>
+  <text x="1090" y="576" class="txt">counter1 = bit[3:2]</text>
+  <text x="1090" y="606" class="txt">counter0 = bit[1:0]</text>
+  <text x="1090" y="638" class="small">history 选择一只计数器</text>
+  <text x="1090" y="665" class="small">其 MSB 给出方向预测</text>
+
+  <rect x="1315" y="500" width="300" height="190" rx="16" class="box" fill="#f0fdfa" stroke="#0f766e"/>
+  <text x="1465" y="539" class="head">方向判定</text>
+  <text x="1465" y="576" class="txt">条件：counter.MSB</text>
+  <text x="1465" y="608" class="txt">非条件：BTB hit 即 taken</text>
+  <text x="1465" y="642" class="small">BTB miss 一律按 PC+4</text>
+  <text x="1465" y="668" class="small">输出 pred_taken</text>
+
+  <rect x="1140" y="190" width="320" height="225" rx="16" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="1300" y="229" class="head">RAS：16 项返回地址栈</text>
+  <text x="1300" y="267" class="txt">ras_stack + ras_sp + ras_count</text>
+  <text x="1300" y="306" class="small">栈非空时，栈顶是最近 call 的 PC+4</text>
+  <text x="1300" y="338" class="small">只服务于 BTB 识别出的 return</text>
+  <text x="1300" y="374" class="small">空栈时不能使用 RAS.top</text>
+
+  <rect x="1535" y="190" width="335" height="260" rx="16" class="box" fill="#ecfdf5" stroke="#16a34a"/>
+  <text x="1702" y="229" class="head">跳转目标选择</text>
+  <text x="1702" y="271" class="txt">return 且 RAS 非空</text>
+  <text x="1702" y="300" class="txt">→ RAS.top</text>
+  <line x1="1580" y1="325" x2="1825" y2="325" class="thin"/>
+  <text x="1702" y="358" class="txt">其他命中的控制流</text>
+  <text x="1702" y="387" class="txt">→ BTB.target</text>
+  <text x="1702" y="421" class="small">输出 pred_target</text>
+
+  <rect x="1950" y="295" width="340" height="220" rx="18" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="2120" y="337" class="head">预测 Next-PC 选择器</text>
+  <text x="2120" y="380" class="txt">pred_taken = 0 → PC+4</text>
+  <text x="2120" y="414" class="txt">pred_taken = 1 → pred_target</text>
+  <text x="2120" y="459" class="small">输出 fq_pred_next_pc</text>
+  <text x="2120" y="485" class="small">并作为下一轮 Current_PC 候选</text>
+
+  <!-- Query arrows -->
+  <path d="M260 350H305" class="blueLine"/>
+  <path d="M565 290H630" class="blueLine"/>
+  <text x="597" y="276" class="label">index + tag</text>
+  <path d="M440 465V595H630" class="blueLine"/>
+  <text x="520" y="580" class="label">同一 index</text>
+  <path d="M860 595H915" class="blueLine"/>
+  <text x="888" y="581" class="label">history</text>
+  <path d="M1255 595H1305" class="blueLine"/>
+  <text x="1280" y="581" class="label">MSB</text>
+  <path d="M1080 405H1285V490H1315" class="blueLine"/>
+  <text x="1190" y="432" class="label">hit + type</text>
+  <path d="M1080 250H1105V175H1505V275H1525" class="blueLine"/>
+  <text x="1310" y="170" class="label">BTB.target + type</text>
+  <path d="M1460 330H1525" class="blueLine"/>
+  <text x="1492" y="316" class="label">RAS.top</text>
+  <path d="M1615 595H1685V535H1905V405H1940" class="blueLine"/>
+  <text x="1795" y="525" class="label">pred_taken</text>
+  <path d="M1870 320H1940" class="blueLine"/>
+  <text x="1905" y="305" class="label">pred_target</text>
+  <path d="M260 390H285V715H2330V470H2300" class="blueLine"/>
+  <text x="2185" y="700" class="label">顺序候选 PC+4</text>
+
+  <rect x="1730" y="555" width="560" height="120" rx="14" fill="#ffffff" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="2010" y="591" class="head">预测时必须保存的元数据</text>
+  <text x="2010" y="626" class="txt">原 PC、pred_next_pc、pred_taken、pred_history</text>
+  <text x="2010" y="654" class="small">本 RTL 并未把 type 作为预测元数据一路携带；执行级重新按真实指令分类</text>
+  <path d="M2120 515V545" class="purpleLine"/>
+
+  <!-- Metadata pipeline band -->
+  <rect x="35" y="800" width="2330" height="270" rx="24" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="65" y="839" class="bandtitle">② 预测元数据与指令同行：几拍后核验的必须是“这一条指令当时的猜测”</text>
+
+  <rect x="150" y="885" width="300" height="120" rx="15" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="300" y="925" class="head">IFQ 表项</text>
+  <text x="300" y="960" class="txt">PC + instruction/exception</text>
+  <text x="300" y="987" class="small">另存 pred_next / taken / history</text>
+
+  <rect x="570" y="885" width="260" height="120" rx="15" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="700" y="925" class="head">IF/ID</text>
+  <text x="700" y="960" class="txt">译码并保留预测信息</text>
+  <text x="700" y="987" class="small">与原 PC 严格对齐</text>
+
+  <rect x="950" y="885" width="260" height="120" rx="15" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="1080" y="925" class="head">ID/EX1</text>
+  <text x="1080" y="960" class="txt">寄存器源与操作类型</text>
+  <text x="1080" y="987" class="small">条件分支可准备快解析</text>
+
+  <rect x="1330" y="885" width="260" height="120" rx="15" class="box" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="1460" y="925" class="head">EX1/EX2</text>
+  <text x="1460" y="960" class="txt">继续保存 pred_next</text>
+  <text x="1460" y="987" class="small">以及预测时 pred_history</text>
+
+  <rect x="1770" y="875" width="430" height="140" rx="15" class="box" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="1985" y="915" class="head">EX2 拿到同一条指令的两份答案</text>
+  <text x="1985" y="951" class="txt">旧答案：pred_next_pc</text>
+  <text x="1985" y="982" class="txt">新答案：由真实操作数算出的 actual_next_pc</text>
+
+  <path d="M2010 675V785H300V875" class="purpleLine"/>
+  <path d="M450 945H560" class="purpleLine"/>
+  <path d="M830 945H940" class="purpleLine"/>
+  <path d="M1210 945H1320" class="purpleLine"/>
+  <path d="M1590 945H1760" class="purpleLine"/>
+
+  <!-- Resolve and training band -->
+  <rect x="35" y="1100" width="2330" height="500" rx="24" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="65" y="1140" class="bandtitle">③ EX1/EX2 真实解析：恢复路径保证正确；训练路径只改善以后</text>
+
+  <rect x="95" y="1205" width="315" height="155" rx="16" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="252" y="1245" class="head">EX1 条件分支快解析</text>
+  <text x="252" y="1281" class="txt">比较真实 rj / rk</text>
+  <text x="252" y="1312" class="small">只检查方向是否猜错</text>
+  <text x="252" y="1338" class="small">方向错可提前 redirect</text>
+
+  <rect x="520" y="1190" width="360" height="185" rx="16" class="box" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="700" y="1230" class="head">EX2 完整真实结果</text>
+  <text x="700" y="1267" class="txt">actual_taken</text>
+  <text x="700" y="1298" class="txt">taken_target / fallthrough</text>
+  <text x="700" y="1330" class="small">actual_next_pc = taken ? target : PC+4</text>
+  <text x="700" y="1356" class="small">同时按真实指令识别 cond/call/return</text>
+
+  <rect x="1010" y="1190" width="350" height="185" rx="16" class="box" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1185" y="1230" class="head">完整 32 位 Next-PC 比较</text>
+  <text x="1185" y="1268" class="txt">pred_next_pc ≠ actual_next_pc ?</text>
+  <text x="1185" y="1305" class="small">能同时发现方向错、目标错、类型污染</text>
+  <text x="1185" y="1337" class="small">比较结果决定是否恢复，而非查训练表</text>
+
+  <rect x="1490" y="1175" width="350" height="205" rx="16" class="box" fill="#dcfce7" stroke="#059669"/>
+  <text x="1665" y="1215" class="head">训练门控与更新信息</text>
+  <text x="1665" y="1253" class="txt">bp_resolve_fire：本条只训练一次</text>
+  <text x="1665" y="1285" class="small">真实方向、index / tag / target / type</text>
+  <text x="1665" y="1314" class="small">branch_pattern 在本次 fire 的时钟沿更新</text>
+  <text x="1665" y="1343" class="small">BTB/RAS 信息先进入 bp_update_*_q</text>
+  <text x="1665" y="1367" class="small">防止 EX2 停多拍时重复训练</text>
+
+  <rect x="1410" y="1450" width="260" height="105" rx="14" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="1540" y="1490" class="head">BTB 写口</text>
+  <text x="1540" y="1525" class="small">bp_update_*_q 后下一拍写表</text>
+
+  <rect x="1740" y="1450" width="270" height="105" rx="14" class="box" fill="#ecfeff" stroke="#0891b2"/>
+  <text x="1875" y="1490" class="head">BHT/PHT 写口</text>
+  <text x="1875" y="1525" class="small">fire 当拍：计数器饱和更新 + history</text>
+
+  <rect x="2080" y="1450" width="240" height="105" rx="14" class="box" fill="#ecfdf5" stroke="#059669"/>
+  <text x="2200" y="1490" class="head">RAS 写口</text>
+  <text x="2200" y="1518" class="small">bp_update_*_q 后下一拍</text>
+  <text x="2200" y="1542" class="small">call push / return pop</text>
+
+  <path d="M410 1282H510" class="orangeLine"/>
+  <path d="M880 1282H1000" class="orangeLine"/>
+  <path d="M700 1190V1162H1665V1175" class="greenLine"/>
+  <path d="M1665 1380V1415H1540V1440" class="greenLine"/>
+  <path d="M1665 1380V1415H1875V1440" class="greenLine"/>
+  <path d="M1665 1380V1415H2200V1440" class="greenLine"/>
+
+  <!-- Recovery loop to Current PC -->
+  <path d="M1185 1375V1575H55V350H60" class="redLine"/>
+  <text x="610" y="1560" class="label" fill="#b91c1c">误预测：actual_next_pc 回送 FQ，并 flush 年轻状态、切换 epoch</text>
+
+  <rect x="1880" y="1190" width="430" height="185" rx="16" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+  <text x="2095" y="1229" class="head">三个训练动作并非每次同时发生</text>
+  <text x="1910" y="1266" class="left">• 任何真实控制流：写入或刷新 BTB</text>
+  <text x="1910" y="1298" class="left">• 仅条件分支：更新选中的 2 位计数器与 history</text>
+  <text x="1910" y="1330" class="left">• 仅真实 call/return：更新 RAS</text>
+  <text x="1910" y="1360" class="left">• 普通指令被陈旧 BTB 误认：清除该 valid</text>
+</svg>
