@@ -1,0 +1,55 @@
+`ifndef CACHE_DEFS_VH
+`define CACHE_DEFS_VH
+
+
+        // Cache perf Counter Enable
+        // `define PERF_COUNTER
+
+
+
+`define CACHE_WAYS 2
+`define CACHE_SETS 128
+`define CACHE_BANKS 8
+`define CACHE_LINE_BYTES 32
+
+`define CACHE_WORD_WIDTH 32
+`define CACHE_BYTE_WIDTH 8
+`define CACHE_LINE_WORDS 8
+`define CACHE_LINE_WIDTH 256
+`define CACHE_WSTRB_WIDTH 4
+
+`define CACHE_TAG_WIDTH 20
+`define CACHE_TAGV_RAM_WIDTH 21
+`define CACHE_INDEX_WIDTH 7
+`define CACHE_OFFSET_WIDTH 5
+`define CACHE_BANK_WIDTH 3
+`define CACHE_BLOCK_ADDR_WIDTH 27
+`define CACHE_LAST_BANK_INDEX 3'd7
+`define CACHE_WAY_WIDTH 1
+
+`define CACHE_TAG_MSB 31
+`define CACHE_TAG_LSB 12
+`define CACHE_INDEX_MSB 11
+`define CACHE_INDEX_LSB 5
+`define CACHE_BANK_MSB 4
+`define CACHE_BANK_LSB 2
+`define CACHE_BYTE_MSB 1
+`define CACHE_BYTE_LSB 0
+
+
+`define CACHE_REQ_WORD 3'b010
+`define CACHE_REQ_LINE 3'b100
+`define CACHE_AXI_WORD_SIZE 3'b010
+`define CACHE_AXI_LINE_LEN 8'd7
+`define CACHE_AXI_WORD_LEN 8'd0
+
+
+`define CACHE_AXI_ID_ICACHE 4'd0
+`define CACHE_AXI_ID_DCACHE 4'd1
+
+        `ifndef DCACHE_PREFETCH_ENABLE
+`define DCACHE_PREFETCH_ENABLE 1
+`endif
+
+
+`endif
