@@ -25,3 +25,6 @@ nscscc-nputeam/
 └── README.md
 ```
 
+#### 开源优秀外校设计
+- **中国科学技术大学也西湖队**
+  - 仓库：https://github.com/YeXiHuTeam/YeXiHuCore
