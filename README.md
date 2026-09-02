@@ -21,10 +21,7 @@ nscscc-nputeam/
 │   ├── nscscc-team1/
 │   ├── nscscc-team5/
 │   ├── nscscc-team6/
+├── Advice.md
 ├── LICENSE
 └── README.md
 ```
-
-#### 开源优秀外校设计
-- **中国科学技术大学也西湖队**
-  - 仓库：https://github.com/YeXiHuTeam/YeXiHuCore
